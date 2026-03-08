@@ -1,0 +1,175 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Truck, Phone, Mail, MapPin, Clock, Menu, X } from 'lucide-react';
+
+export default function ContactPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center">
+              <Truck className="h-8 w-8 text-orange-500" />
+              <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
+            </Link>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="/" className="text-gray-700 hover:text-orange-500 font-medium">Home</Link>
+              <Link href="/how-it-works" className="text-gray-700 hover:text-orange-500 font-medium">How It Works</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-orange-500 font-medium">Pricing</Link>
+              <Link href="/faq" className="text-gray-700 hover:text-orange-500 font-medium">FAQ</Link>
+              <Link href="/contact" className="text-orange-500 font-medium">Contact</Link>
+              <Link href="/book">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+              </Link>
+            </div>
+
+            <div className="md:hidden">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-gray-700 p-2">
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-4 py-4 space-y-3">
+              <Link href="/" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Home</Link>
+              <Link href="/how-it-works" className="block text-gray-700 hover:text-orange-500 font-medium py-2">How It Works</Link>
+              <Link href="/pricing" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Pricing</Link>
+              <Link href="/faq" className="block text-gray-700 hover:text-orange-500 font-medium py-2">FAQ</Link>
+              <Link href="/contact" className="block text-orange-500 font-medium py-2">Contact</Link>
+              <Link href="/book" className="block">
+                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-orange-500 to-orange-600 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
+          <p className="text-xl text-orange-100">We're here to help with your junk removal needs</p>
+        </div>
+      </section>
+
+      {/* Contact Info */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Phone className="h-8 w-8 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Phone</h3>
+                <a href="tel:+15091234567" className="text-orange-500 hover:text-orange-600 text-lg font-medium">
+                  (509) 123-4567
+                </a>
+                <p className="text-gray-600 text-sm mt-2">Call or text anytime</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Email</h3>
+                <a href="mailto:info@ezloadndump.com" className="text-orange-500 hover:text-orange-600 font-medium">
+                  info@ezloadndump.com
+                </a>
+                <p className="text-gray-600 text-sm mt-2">We respond within 24 hours</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="h-8 w-8 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Service Area</h3>
+                <p className="text-gray-700 font-medium">Spokane, WA</p>
+                <p className="text-gray-600 text-sm mt-2">30-mile service radius</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-orange-500" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Hours</h3>
+                <p className="text-gray-700">Mon-Fri: 7am - 6pm</p>
+                <p className="text-gray-700">Saturday: 8am - 4pm</p>
+                <p className="text-gray-600 text-sm">Sunday: Closed</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Service Areas */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Areas We Serve</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            We proudly serve Spokane and surrounding communities within a 30-mile radius. Contact us if you're outside our standard service area — we may still be able to help!
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              'Spokane',
+              'Spokane Valley',
+              'Liberty Lake',
+              'Cheney',
+              'Medical Lake',
+              'Airway Heights',
+              'Mead',
+              'Nine Mile Falls',
+              'Millwood',
+              'Veradale',
+              'Otis Orchards',
+              'Newman Lake'
+            ].map((area) => (
+              <span key={area} className="px-4 py-2 bg-white rounded-full text-gray-700 shadow-sm border">
+                {area}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 bg-orange-500 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Book?</h2>
+          <p className="text-xl text-orange-100 mb-8">Skip the call — book online in just a few minutes!</p>
+          <Link href="/book">
+            <Button size="lg" className="bg-white text-orange-500 hover:bg-gray-100 text-lg px-8 py-6">
+              Book Online Now
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-100 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600">
+          <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
+          <p className="mt-2">Serving Spokane, WA & surrounding areas</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
