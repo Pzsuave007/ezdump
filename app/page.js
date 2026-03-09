@@ -826,6 +826,15 @@ export default function HomePage() {
       {/* Service Area */}
       <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-6">
+            <Image 
+              src="/logo.png" 
+              alt="Easy Load & Dump" 
+              width={280} 
+              height={90} 
+              className="h-20 md:h-24 w-auto mx-auto"
+            />
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
           <p className="text-xl text-gray-600 mb-6">
             Proudly serving <span className="font-semibold text-gray-900">Spokane, WA</span> and surrounding communities within a 30-mile radius.
@@ -862,14 +871,14 @@ export default function HomePage() {
       <footer className="bg-black text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
-            <div>
+            <div className="md:col-span-1">
               <div className="mb-6">
                 <Image 
                   src="/logo.png" 
                   alt="Easy Load & Dump" 
-                  width={200} 
-                  height={65} 
-                  className="h-16 w-auto"
+                  width={280} 
+                  height={90} 
+                  className="h-24 w-auto"
                 />
               </div>
               <p className="text-gray-400 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
