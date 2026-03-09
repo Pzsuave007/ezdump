@@ -5,9 +5,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign, Calculator } from 'lucide-react';
+import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign, Calculator, Loader2, AlertCircle, Navigation } from 'lucide-react';
+
+// Office location coordinates (2508 E 5th Ave Spokane WA 99202)
+const OFFICE_LAT = 47.6515;
+const OFFICE_LNG = -117.3985;
+const PHONE_NUMBER = '509-863-3109';
+
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 3959; // Earth's radius in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -17,7 +36,12 @@ export default function HomePage() {
   // Calculator state
   const [calcDuration, setCalcDuration] = useState('2');
   const [calcLoadType, setCalcLoadType] = useState('household');
-  const [calcDistance, setCalcDistance] = useState('standard');
+  
+  // Address/distance state
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [checkingDistance, setCheckingDistance] = useState(false);
+  const [distanceResult, setDistanceResult] = useState(null); // { miles, tier, fee, canServe }
+  const [addressError, setAddressError] = useState('');
 
   useEffect(() => {
     fetch('/api/pricing')
@@ -28,24 +52,125 @@ export default function HomePage() {
 
   const totalEstimate = pricing ? pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee : 275;
   
+  // Check distance from address
+  const checkDistance = async () => {
+    if (!customerAddress.trim()) {
+      setAddressError('Please enter your address');
+      return;
+    }
+    
+    setCheckingDistance(true);
+    setAddressError('');
+    setDistanceResult(null);
+    
+    try {
+      // Use Nominatim (OpenStreetMap) for free geocoding
+      const encodedAddress = encodeURIComponent(customerAddress + ', WA, USA');
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+        { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
+      );
+      
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        const miles = calculateDistance(OFFICE_LAT, OFFICE_LNG, parseFloat(lat), parseFloat(lon));
+        
+        // Determine pricing tier
+        let tier, fee, canServe;
+        if (miles <= 20) {
+          tier = 'standard';
+          fee = 50;
+          canServe = true;
+        } else if (miles <= 30) {
+          tier = 'extended';
+          fee = 75;
+          canServe = true;
+        } else if (miles <= 50) {
+          tier = 'far';
+          fee = 100;
+          canServe = true;
+        } else {
+          tier = 'outside';
+          fee = 0;
+          canServe = false;
+        }
+        
+        setDistanceResult({ miles: Math.round(miles * 10) / 10, tier, fee, canServe });
+      } else {
+        setAddressError('Could not find that address. Please check and try again.');
+      }
+    } catch (error) {
+      console.error('Error checking distance:', error);
+      setAddressError('Error checking distance. Please try again.');
+    } finally {
+      setCheckingDistance(false);
+    }
+  };
+  
+  // Use browser geolocation
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setAddressError('Geolocation is not supported by your browser');
+      return;
+    }
+    
+    setCheckingDistance(true);
+    setAddressError('');
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const miles = calculateDistance(OFFICE_LAT, OFFICE_LNG, latitude, longitude);
+        
+        // Determine pricing tier
+        let tier, fee, canServe;
+        if (miles <= 20) {
+          tier = 'standard';
+          fee = 50;
+          canServe = true;
+        } else if (miles <= 30) {
+          tier = 'extended';
+          fee = 75;
+          canServe = true;
+        } else if (miles <= 50) {
+          tier = 'far';
+          fee = 100;
+          canServe = true;
+        } else {
+          tier = 'outside';
+          fee = 0;
+          canServe = false;
+        }
+        
+        setDistanceResult({ miles: Math.round(miles * 10) / 10, tier, fee, canServe });
+        setCustomerAddress('(Using your current location)');
+        setCheckingDistance(false);
+      },
+      (error) => {
+        setAddressError('Could not get your location. Please enter your address manually.');
+        setCheckingDistance(false);
+      }
+    );
+  };
+  
   // Calculate price based on selections
   const calculatePrice = () => {
-    if (!pricing) return { base: 99, delivery: 50, dump: 65, extra: 0, travel: 0, total: 214 };
+    if (!pricing) return { base: 99, delivery: 50, dump: 65, extra: 0, total: 214 };
     
     const base = pricing.baseRentalFee || 99;
-    const delivery = pricing.deliveryFee || 50;
     const dump = pricing.dumpFee || 65;
     const extraHourFee = pricing.extraHourFee || 35;
-    const travelFee = pricing.travelFee || 50;
+    
+    // Use distance-based delivery fee if available, otherwise default
+    const delivery = distanceResult?.fee || 50;
     
     // Extra hours calculation
     const extraHours = Math.max(0, parseInt(calcDuration) - 2);
     const extraHoursCost = extraHours * extraHourFee;
     
-    // Travel fee for extended distance
-    const travelCost = calcDistance === 'extended' ? travelFee : 0;
-    
-    const total = base + delivery + dump + extraHoursCost + travelCost;
+    const total = base + delivery + dump + extraHoursCost;
     
     return {
       base,
@@ -53,7 +178,6 @@ export default function HomePage() {
       dump,
       extraHours,
       extraHoursCost,
-      travelCost,
       total
     };
   };
@@ -65,7 +189,8 @@ export default function HomePage() {
     const params = new URLSearchParams({
       duration: calcDuration,
       loadType: calcLoadType,
-      distance: calcDistance
+      distance: distanceResult?.tier || 'standard',
+      address: customerAddress !== '(Using your current location)' ? customerAddress : ''
     });
     router.push(`/book?${params.toString()}`);
   };
@@ -216,51 +341,117 @@ export default function HomePage() {
           <Card className="max-w-2xl mx-auto shadow-xl">
             <CardContent className="p-6 md:p-8">
               {/* Calculator Options */}
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                {/* Duration */}
+              <div className="space-y-6 mb-8">
+                {/* Address Input for Distance */}
                 <div>
-                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Rental Duration</Label>
-                  <Select value={calcDuration} onValueChange={setCalcDuration}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2">2 Hours (Standard)</SelectItem>
-                      <SelectItem value="3">3 Hours (+${pricing?.extraHourFee || 35})</SelectItem>
-                      <SelectItem value="4">4 Hours (+${(pricing?.extraHourFee || 35) * 2})</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    <MapPin className="inline h-4 w-4 mr-1" /> Your Address
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter your address (e.g., 123 Main St, Spokane)"
+                      value={customerAddress}
+                      onChange={(e) => {
+                        setCustomerAddress(e.target.value);
+                        setDistanceResult(null);
+                        setAddressError('');
+                      }}
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={checkDistance} 
+                      disabled={checkingDistance}
+                      variant="outline"
+                    >
+                      {checkingDistance ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Check'}
+                    </Button>
+                  </div>
+                  <button
+                    onClick={useMyLocation}
+                    className="text-sm text-gray-600 hover:text-gray-900 mt-2 flex items-center"
+                    disabled={checkingDistance}
+                  >
+                    <Navigation className="h-3 w-3 mr-1" /> Use my current location
+                  </button>
+                  
+                  {addressError && (
+                    <p className="text-red-500 text-sm mt-2 flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-1" /> {addressError}
+                    </p>
+                  )}
+                  
+                  {/* Distance Result */}
+                  {distanceResult && (
+                    <div className={`mt-3 p-3 rounded-lg ${distanceResult.canServe ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      {distanceResult.canServe ? (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-green-800">
+                              <CheckCircle className="inline h-4 w-4 mr-1" />
+                              {distanceResult.miles} miles away
+                            </p>
+                            <p className="text-sm text-green-600">
+                              {distanceResult.tier === 'standard' && 'Standard service area - $50 delivery'}
+                              {distanceResult.tier === 'extended' && 'Extended area - $75 delivery (+$25)'}
+                              {distanceResult.tier === 'far' && 'Far distance - $100 delivery (+$50)'}
+                            </p>
+                          </div>
+                          <span className="text-xl font-bold text-green-700">${distanceResult.fee}</span>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="font-medium text-red-800">
+                            <AlertCircle className="inline h-4 w-4 mr-1" />
+                            {distanceResult.miles} miles - Outside Service Area
+                          </p>
+                          <p className="text-sm text-red-600 mt-1">
+                            We typically serve within 50 miles. Please call us to discuss your project.
+                          </p>
+                          <a href={`tel:${PHONE_NUMBER}`} className="inline-flex items-center mt-2 text-red-800 font-medium hover:text-red-900">
+                            <Phone className="h-4 w-4 mr-1" /> Call {PHONE_NUMBER}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
-                {/* Load Type */}
-                <div>
-                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Type of Load</Label>
-                  <Select value={calcLoadType} onValueChange={setCalcLoadType}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="household">Household Junk</SelectItem>
-                      <SelectItem value="furniture">Furniture</SelectItem>
-                      <SelectItem value="yard_waste">Yard Waste</SelectItem>
-                      <SelectItem value="construction">Construction Debris</SelectItem>
-                      <SelectItem value="mixed">Mixed Load</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Distance */}
-                <div>
-                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Your Location</Label>
-                  <Select value={calcDistance} onValueChange={setCalcDistance}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Within 20 miles</SelectItem>
-                      <SelectItem value="extended">20-30 miles (+${pricing?.travelFee || 50})</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Duration */}
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                      <Clock className="inline h-4 w-4 mr-1" /> Rental Duration
+                    </Label>
+                    <Select value={calcDuration} onValueChange={setCalcDuration}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2">2 Hours (Standard)</SelectItem>
+                        <SelectItem value="3">3 Hours (+${pricing?.extraHourFee || 35})</SelectItem>
+                        <SelectItem value="4">4 Hours (+${(pricing?.extraHourFee || 35) * 2})</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Load Type */}
+                  <div>
+                    <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                      <Package className="inline h-4 w-4 mr-1" /> Type of Load
+                    </Label>
+                    <Select value={calcLoadType} onValueChange={setCalcLoadType}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="household">Household Junk</SelectItem>
+                        <SelectItem value="furniture">Furniture</SelectItem>
+                        <SelectItem value="yard_waste">Yard Waste</SelectItem>
+                        <SelectItem value="construction">Construction Debris</SelectItem>
+                        <SelectItem value="mixed">Mixed Load</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               
@@ -273,7 +464,7 @@ export default function HomePage() {
                     <span>${calcPricing.base}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
-                    <span>Delivery & Pickup</span>
+                    <span>Delivery & Pickup {distanceResult && `(${distanceResult.miles} mi)`}</span>
                     <span>${calcPricing.delivery}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
@@ -286,12 +477,6 @@ export default function HomePage() {
                       <span>+${calcPricing.extraHoursCost}</span>
                     </div>
                   )}
-                  {calcPricing.travelCost > 0 && (
-                    <div className="flex justify-between text-gray-700">
-                      <span>Extended Travel Fee</span>
-                      <span>+${calcPricing.travelCost}</span>
-                    </div>
-                  )}
                   <div className="border-t pt-3 flex justify-between">
                     <span className="text-xl font-bold text-gray-900">Your Total</span>
                     <span className="text-3xl font-bold text-green-600">${calcPricing.total}</span>
@@ -300,16 +485,29 @@ export default function HomePage() {
               </div>
               
               {/* Book Now Button */}
-              <Button 
-                onClick={handleBookFromCalculator}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6"
-                size="lg"
-              >
-                Book Now for ${calcPricing.total} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              {(!distanceResult || distanceResult.canServe) ? (
+                <Button 
+                  onClick={handleBookFromCalculator}
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6"
+                  size="lg"
+                >
+                  Book Now for ${calcPricing.total} <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              ) : (
+                <a href={`tel:${PHONE_NUMBER}`}>
+                  <Button 
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6"
+                    size="lg"
+                  >
+                    <Phone className="mr-2 h-5 w-5" /> Call Us to Discuss
+                  </Button>
+                </a>
+              )}
               
               <p className="text-center text-sm text-gray-500 mt-4">
-                No payment required now. We'll confirm your booking first.
+                {(!distanceResult || distanceResult.canServe) 
+                  ? "No payment required now. We'll confirm your booking first."
+                  : "We may still be able to serve you - let's discuss your project!"}
               </p>
             </CardContent>
           </Card>
