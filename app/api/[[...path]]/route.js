@@ -2,6 +2,18 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
 import { hashPassword, verifyPassword, generateToken } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
+import Stripe from 'stripe';
+
+// Initialize Stripe with integration proxy
+const INTEGRATION_PROXY_URL = process.env.INTEGRATION_PROXY_URL || 'https://integrations.emergentagent.com';
+const stripe = new Stripe(process.env.STRIPE_API_KEY || 'sk_test_emergent', {
+  apiVersion: '2024-12-18.acacia',
+  // Use integration proxy if available
+  host: INTEGRATION_PROXY_URL ? new URL(INTEGRATION_PROXY_URL).hostname : undefined,
+});
+
+// Deposit amount configuration
+const DEPOSIT_AMOUNT = 50.00; // Fixed $50 deposit
 
 // Helper to add CORS headers
 function corsHeaders() {
@@ -432,6 +444,176 @@ export async function POST(request, { params }) {
         await db.collection('sessions').deleteOne({ token });
       }
       return NextResponse.json({ success: true }, { headers: corsHeaders() });
+    }
+    
+    // Create Stripe checkout session for booking deposit
+    if (path === '/payments/create-checkout') {
+      const { bookingId, originUrl } = body;
+      
+      if (!bookingId || !originUrl) {
+        return NextResponse.json({ error: 'Booking ID and origin URL required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      // Get the booking
+      const booking = await db.collection('bookings').findOne({ id: bookingId });
+      if (!booking) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404, headers: corsHeaders() });
+      }
+      
+      // Check if already paid
+      if (booking.paymentStatus === 'paid' || booking.paymentStatus === 'deposit_paid') {
+        return NextResponse.json({ error: 'Deposit already paid' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      // Check if Stripe is properly configured
+      const stripeKey = process.env.STRIPE_API_KEY;
+      if (!stripeKey || stripeKey === 'sk_test_emergent' || stripeKey.length < 20) {
+        // Return a demo response for testing - indicates Stripe is ready but needs real key
+        return NextResponse.json({ 
+          demo: true,
+          message: 'Stripe payment integration is ready. Add your Stripe API key to enable live payments.',
+          bookingId: bookingId,
+          amount: DEPOSIT_AMOUNT
+        }, { headers: corsHeaders() });
+      }
+      
+      try {
+        // Create Stripe checkout session
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items: [
+            {
+              price_data: {
+                currency: 'usd',
+                product_data: {
+                  name: 'Dump Trailer Rental Deposit',
+                  description: `Booking for ${booking.preferredDate} at ${booking.preferredTime}`,
+                },
+                unit_amount: Math.round(DEPOSIT_AMOUNT * 100), // Stripe uses cents
+              },
+              quantity: 1,
+            },
+          ],
+          mode: 'payment',
+          success_url: `${originUrl}/booking-confirmation/${bookingId}?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+          cancel_url: `${originUrl}/booking-confirmation/${bookingId}?payment=cancelled`,
+          metadata: {
+            bookingId: bookingId,
+            customerEmail: booking.email,
+            customerName: booking.customerName,
+          },
+        });
+        
+        // Create payment transaction record
+        await db.collection('payment_transactions').insertOne({
+          id: uuidv4(),
+          bookingId: bookingId,
+          sessionId: session.id,
+          amount: DEPOSIT_AMOUNT,
+          currency: 'usd',
+          status: 'pending',
+          paymentStatus: 'initiated',
+          customerEmail: booking.email,
+          metadata: {
+            bookingId: bookingId,
+            customerName: booking.customerName,
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        
+        return NextResponse.json({ 
+          url: session.url, 
+          sessionId: session.id 
+        }, { headers: corsHeaders() });
+        
+      } catch (stripeError) {
+        console.error('Stripe Error:', stripeError);
+        return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500, headers: corsHeaders() });
+      }
+    }
+    
+    // Check payment status
+    if (path === '/payments/status') {
+      const { sessionId } = body;
+      
+      if (!sessionId) {
+        return NextResponse.json({ error: 'Session ID required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      try {
+        // Get session from Stripe
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        
+        // Get payment transaction
+        const transaction = await db.collection('payment_transactions').findOne({ sessionId });
+        
+        // Determine payment status
+        let paymentResult = {
+          status: session.status,
+          paymentStatus: session.payment_status,
+          amount: session.amount_total / 100,
+          currency: session.currency,
+        };
+        
+        // If payment is successful and not already processed
+        if (session.payment_status === 'paid' && transaction && transaction.paymentStatus !== 'completed') {
+          // Update payment transaction
+          await db.collection('payment_transactions').updateOne(
+            { sessionId },
+            { 
+              $set: { 
+                status: 'complete',
+                paymentStatus: 'completed',
+                stripePaymentIntentId: session.payment_intent,
+                updatedAt: new Date() 
+              } 
+            }
+          );
+          
+          // Update booking payment status
+          if (transaction.bookingId) {
+            await db.collection('bookings').updateOne(
+              { id: transaction.bookingId },
+              { 
+                $set: { 
+                  paymentStatus: 'deposit_paid',
+                  depositAmount: DEPOSIT_AMOUNT,
+                  amountPaid: DEPOSIT_AMOUNT,
+                  paymentMethod: 'stripe',
+                  stripeSessionId: sessionId,
+                  updatedAt: new Date() 
+                } 
+              }
+            );
+          }
+        } else if (session.status === 'expired') {
+          // Update transaction as expired
+          await db.collection('payment_transactions').updateOne(
+            { sessionId },
+            { 
+              $set: { 
+                status: 'expired',
+                paymentStatus: 'expired',
+                updatedAt: new Date() 
+              } 
+            }
+          );
+        }
+        
+        return NextResponse.json(paymentResult, { headers: corsHeaders() });
+        
+      } catch (stripeError) {
+        console.error('Stripe Status Error:', stripeError);
+        return NextResponse.json({ error: 'Failed to check payment status' }, { status: 500, headers: corsHeaders() });
+      }
+    }
+    
+    // Stripe webhook handler
+    if (path === '/webhook/stripe') {
+      // For webhooks, we need raw body - but in this simplified version, 
+      // we rely on polling for status updates
+      return NextResponse.json({ received: true }, { headers: corsHeaders() });
     }
     
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders() });
