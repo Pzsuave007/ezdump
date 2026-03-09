@@ -79,7 +79,7 @@ export default function SettingsPage() {
     <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <div className="flex items-center">
-          <Truck className="h-8 w-8 text-orange-500" />
+          <Truck className="h-8 w-8 text-blue-500" />
           <span className="ml-2 font-bold">Admin Panel</span>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="md:hidden">
@@ -116,7 +116,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -131,7 +131,7 @@ export default function SettingsPage() {
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center">
-          <Settings className="h-6 w-6 text-orange-500" />
+          <Settings className="h-6 w-6 text-blue-600" />
           <span className="ml-2 font-bold">Settings</span>
         </div>
         <div className="w-6"></div>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Settings</h1>
             <p className="text-gray-600">Manage pricing and business settings</p>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="bg-orange-500 hover:bg-orange-600">
+          <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Save Changes
           </Button>
@@ -155,7 +155,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <DollarSign className="h-5 w-5 mr-2 text-orange-500" />
+                <DollarSign className="h-5 w-5 mr-2 text-blue-600" />
                 Pricing Settings
               </CardTitle>
               <CardDescription>Set your base prices for services</CardDescription>
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 <div className="border-t pt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Standard Total</span>
-                    <span className="text-orange-500">
+                    <span className="text-blue-600">
                       ${(pricing?.baseRentalFee || 0) + (pricing?.deliveryFee || 0) + (pricing?.dumpFee || 0)}
                     </span>
                   </div>

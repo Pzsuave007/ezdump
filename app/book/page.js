@@ -82,7 +82,6 @@ export default function BookingPage() {
     }
   };
 
-  // Get minimum date (today)
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -92,10 +91,10 @@ export default function BookingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-orange-500" />
+              <Truck className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
-            <Link href="/" className="text-gray-600 hover:text-orange-500 flex items-center">
+            <Link href="/" className="text-gray-600 hover:text-blue-600 flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Link>
           </div>
@@ -271,7 +270,7 @@ export default function BookingPage() {
                           value="booking"
                           checked={formData.requestType === 'booking'}
                           onChange={(e) => handleChange('requestType', e.target.value)}
-                          className="w-4 h-4 text-orange-500"
+                          className="w-4 h-4 text-blue-600"
                         />
                         <span>Book Now</span>
                       </label>
@@ -282,7 +281,7 @@ export default function BookingPage() {
                           value="quote"
                           checked={formData.requestType === 'quote'}
                           onChange={(e) => handleChange('requestType', e.target.value)}
-                          className="w-4 h-4 text-orange-500"
+                          className="w-4 h-4 text-blue-600"
                         />
                         <span>Request Quote First</span>
                       </label>
@@ -297,13 +296,13 @@ export default function BookingPage() {
                       onCheckedChange={(checked) => handleChange('agreedToTerms', checked)}
                     />
                     <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                      I agree to the <Link href="/faq" className="text-orange-500 hover:underline">terms and conditions</Link>, including the list of prohibited items and weight restrictions.
+                      I agree to the <Link href="/faq" className="text-blue-600 hover:underline">terms and conditions</Link>, including the list of prohibited items and weight restrictions.
                     </label>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     size="lg"
                     disabled={loading}
                   >
@@ -347,12 +346,12 @@ export default function BookingPage() {
                   <div className="border-t pt-3">
                     <div className="flex justify-between font-bold text-lg">
                       <span>Estimated Total</span>
-                      <span className="text-orange-500">${calculateEstimate()}</span>
+                      <span className="text-blue-600">${calculateEstimate()}</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-6 p-4 bg-orange-50 rounded-lg text-sm text-gray-600">
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
                   <p className="font-semibold text-gray-800 mb-2">Note:</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Final price may vary based on load weight</li>

@@ -16,18 +16,18 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-orange-500" />
+              <Truck className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-orange-500 font-medium">Home</Link>
-              <Link href="/how-it-works" className="text-gray-700 hover:text-orange-500 font-medium">How It Works</Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-orange-500 font-medium">Pricing</Link>
-              <Link href="/faq" className="text-gray-700 hover:text-orange-500 font-medium">FAQ</Link>
-              <Link href="/contact" className="text-orange-500 font-medium">Contact</Link>
+              <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">Home</Link>
+              <Link href="/how-it-works" className="text-gray-700 hover:text-blue-600 font-medium">How It Works</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-blue-600 font-medium">Pricing</Link>
+              <Link href="/faq" className="text-gray-700 hover:text-blue-600 font-medium">FAQ</Link>
+              <Link href="/contact" className="text-blue-600 font-medium">Contact</Link>
               <Link href="/book">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
               </Link>
             </div>
 
@@ -42,13 +42,13 @@ export default function ContactPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Home</Link>
-              <Link href="/how-it-works" className="block text-gray-700 hover:text-orange-500 font-medium py-2">How It Works</Link>
-              <Link href="/pricing" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Pricing</Link>
-              <Link href="/faq" className="block text-gray-700 hover:text-orange-500 font-medium py-2">FAQ</Link>
-              <Link href="/contact" className="block text-orange-500 font-medium py-2">Contact</Link>
+              <Link href="/" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Home</Link>
+              <Link href="/how-it-works" className="block text-gray-700 hover:text-blue-600 font-medium py-2">How It Works</Link>
+              <Link href="/pricing" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Pricing</Link>
+              <Link href="/faq" className="block text-gray-700 hover:text-blue-600 font-medium py-2">FAQ</Link>
+              <Link href="/contact" className="block text-blue-600 font-medium py-2">Contact</Link>
               <Link href="/book" className="block">
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
               </Link>
             </div>
           </div>
@@ -56,10 +56,10 @@ export default function ContactPage() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-orange-500 to-orange-600 text-white py-16">
+      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-orange-100">We're here to help with your junk removal needs</p>
+          <p className="text-xl text-blue-100">We're here to help with your junk removal needs</p>
         </div>
       </section>
 
@@ -69,11 +69,11 @@ export default function ContactPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="h-8 w-8 text-orange-500" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Phone className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Phone</h3>
-                <a href="tel:+15091234567" className="text-orange-500 hover:text-orange-600 text-lg font-medium">
+                <a href="tel:+15091234567" className="text-blue-600 hover:text-blue-700 text-lg font-medium">
                   (509) 123-4567
                 </a>
                 <p className="text-gray-600 text-sm mt-2">Call or text anytime</p>
@@ -82,11 +82,11 @@ export default function ContactPage() {
 
             <Card>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-orange-500" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Email</h3>
-                <a href="mailto:info@ezloadndump.com" className="text-orange-500 hover:text-orange-600 font-medium">
+                <a href="mailto:info@ezloadndump.com" className="text-blue-600 hover:text-blue-700 font-medium">
                   info@ezloadndump.com
                 </a>
                 <p className="text-gray-600 text-sm mt-2">We respond within 24 hours</p>
@@ -95,8 +95,8 @@ export default function ContactPage() {
 
             <Card>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="h-8 w-8 text-orange-500" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Service Area</h3>
                 <p className="text-gray-700 font-medium">Spokane, WA</p>
@@ -106,8 +106,8 @@ export default function ContactPage() {
 
             <Card>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-orange-500" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Hours</h3>
                 <p className="text-gray-700">Mon-Fri: 7am - 6pm</p>
@@ -151,12 +151,12 @@ export default function ContactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-500 text-white">
+      <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Book?</h2>
-          <p className="text-xl text-orange-100 mb-8">Skip the call — book online in just a few minutes!</p>
+          <p className="text-xl text-blue-100 mb-8">Skip the call — book online in just a few minutes!</p>
           <Link href="/book">
-            <Button size="lg" className="bg-white text-orange-500 hover:bg-gray-100 text-lg px-8 py-6">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
               Book Online Now
             </Button>
           </Link>

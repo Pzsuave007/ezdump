@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <Truck className="h-10 w-10 text-orange-500" />
+            <Truck className="h-10 w-10 text-blue-600" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>Easy Load & Dump Dashboard</CardDescription>
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               disabled={loading}
             >
               {loading ? (

@@ -116,7 +116,7 @@ export default function JobDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -139,7 +139,7 @@ export default function JobDetailPage() {
               <p className="text-sm text-gray-500">ID: {job.id.slice(0, 8)}...</p>
             </div>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="bg-orange-500 hover:bg-orange-600">
+          <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Save
           </Button>
@@ -165,7 +165,7 @@ export default function JobDetailPage() {
                   variant={job.status === status ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => handleChange('status', status)}
-                  className={job.status === status ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                  className={job.status === status ? 'bg-blue-600 hover:bg-blue-700' : ''}
                 >
                   {status.replace('_', ' ')}
                 </Button>
@@ -299,7 +299,7 @@ export default function JobDetailPage() {
               {(job.extraCharges || []).length > 0 && (
                 <div className="space-y-2 mb-4">
                   {job.extraCharges.map((charge, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                    <div key={idx} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                       <div>
                         <span className="font-medium">{charge.type}</span>
                         {charge.note && <span className="text-sm text-gray-500 ml-2">({charge.note})</span>}
@@ -411,7 +411,7 @@ export default function JobDetailPage() {
               </div>
               <div className="flex justify-between text-lg font-bold mt-2 pt-2 border-t border-green-200">
                 <span>Balance Due</span>
-                <span className="text-orange-500">${(job.finalPrice || calculateTotal()) - (job.amountPaid || 0)}</span>
+                <span className="text-blue-600">${(job.finalPrice || calculateTotal()) - (job.amountPaid || 0)}</span>
               </div>
             </div>
           </CardContent>

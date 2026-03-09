@@ -30,7 +30,7 @@ export default function BookingConfirmationPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -63,7 +63,7 @@ export default function BookingConfirmationPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-orange-500" />
+              <Truck className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
           </div>
@@ -116,12 +116,12 @@ export default function BookingConfirmationPage() {
               <div className="border-t mt-4 pt-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Estimated Total:</span>
-                  <span className="text-orange-500">${booking.estimatedPrice}</span>
+                  <span className="text-blue-600">${booking.estimatedPrice}</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-orange-50 rounded-lg p-6 text-left mb-8">
+            <div className="bg-blue-50 rounded-lg p-6 text-left mb-8">
               <h3 className="font-semibold text-gray-900 mb-2">What Happens Next?</h3>
               <ol className="list-decimal list-inside space-y-2 text-gray-600">
                 <li>We'll review your request and check availability</li>
@@ -142,7 +142,7 @@ export default function BookingConfirmationPage() {
             </div>
 
             <Link href="/">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
               </Button>
             </Link>

@@ -67,18 +67,18 @@ export default function FAQPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-orange-500" />
+              <Truck className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-orange-500 font-medium">Home</Link>
-              <Link href="/how-it-works" className="text-gray-700 hover:text-orange-500 font-medium">How It Works</Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-orange-500 font-medium">Pricing</Link>
-              <Link href="/faq" className="text-orange-500 font-medium">FAQ</Link>
-              <Link href="/contact" className="text-gray-700 hover:text-orange-500 font-medium">Contact</Link>
+              <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">Home</Link>
+              <Link href="/how-it-works" className="text-gray-700 hover:text-blue-600 font-medium">How It Works</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-blue-600 font-medium">Pricing</Link>
+              <Link href="/faq" className="text-blue-600 font-medium">FAQ</Link>
+              <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
               <Link href="/book">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
               </Link>
             </div>
 
@@ -93,13 +93,13 @@ export default function FAQPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Home</Link>
-              <Link href="/how-it-works" className="block text-gray-700 hover:text-orange-500 font-medium py-2">How It Works</Link>
-              <Link href="/pricing" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Pricing</Link>
-              <Link href="/faq" className="block text-orange-500 font-medium py-2">FAQ</Link>
-              <Link href="/contact" className="block text-gray-700 hover:text-orange-500 font-medium py-2">Contact</Link>
+              <Link href="/" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Home</Link>
+              <Link href="/how-it-works" className="block text-gray-700 hover:text-blue-600 font-medium py-2">How It Works</Link>
+              <Link href="/pricing" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Pricing</Link>
+              <Link href="/faq" className="block text-blue-600 font-medium py-2">FAQ</Link>
+              <Link href="/contact" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Contact</Link>
               <Link href="/book" className="block">
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Book Now</Button>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
               </Link>
             </div>
           </div>
@@ -107,10 +107,10 @@ export default function FAQPage() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-orange-500 to-orange-600 text-white py-16">
+      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-          <p className="text-xl text-orange-100">Everything you need to know about our service</p>
+          <p className="text-xl text-blue-100">Everything you need to know about our service</p>
         </div>
       </section>
 
@@ -120,7 +120,7 @@ export default function FAQPage() {
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, idx) => (
               <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-lg px-4">
-                <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-orange-500">
+                <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-blue-600">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-gray-600">
@@ -142,7 +142,7 @@ export default function FAQPage() {
               <Button size="lg" variant="outline" className="text-lg px-8 py-6">Contact Us</Button>
             </Link>
             <Link href="/book">
-              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white text-lg px-8 py-6">Book Now</Button>
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6">Book Now</Button>
             </Link>
           </div>
         </div>
