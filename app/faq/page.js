@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Truck, Menu, X } from 'lucide-react';
@@ -67,8 +68,13 @@ export default function FAQPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-gray-900" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
+              <Image 
+                src="/logo.png" 
+                alt="Easy Load & Dump" 
+                width={150} 
+                height={50} 
+                className="h-10 w-auto"
+              />
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -261,10 +262,16 @@ export default function HomePage() {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Truck className="h-8 w-8 text-gray-900" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
-            </div>
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Easy Load & Dump" 
+                width={180} 
+                height={60} 
+                className="h-12 w-auto"
+                priority
+              />
+            </Link>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
@@ -856,9 +863,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center mb-4">
-                <Truck className="h-6 w-6 text-white" />
-                <span className="ml-2 font-bold">Easy Load & Dump</span>
+              <div className="mb-4">
+                <Image 
+                  src="/logo.png" 
+                  alt="Easy Load & Dump" 
+                  width={150} 
+                  height={50} 
+                  className="h-12 w-auto"
+                />
               </div>
               <p className="text-gray-400 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
             </div>
