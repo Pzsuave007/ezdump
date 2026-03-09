@@ -321,7 +321,7 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Dump Trailer Rental<br />Made Simple
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-6 text-gray-300 max-w-3xl mx-auto">
               We drop it off. You fill it up. We haul it away.<br />
               Junk removal has never been this easy.
             </p>
@@ -345,10 +345,10 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-8 md:py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">How It Works</h2>
-          <p className="text-center text-gray-600 mb-12 text-lg">Simple 3-step process to get rid of your junk</p>
+          <p className="text-center text-gray-600 mb-6 text-lg">Simple 3-step process to get rid of your junk</p>
           
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="text-center p-6 border-2 border-transparent hover:border-gray-300 transition-all hover:shadow-lg">
@@ -388,9 +388,9 @@ export default function HomePage() {
       </section>
 
       {/* Interactive Price Calculator - MOVED UP */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-4">
               <Calculator className="h-8 w-8 text-white" />
             </div>
@@ -401,7 +401,7 @@ export default function HomePage() {
           <Card className="max-w-2xl mx-auto shadow-xl">
             <CardContent className="p-6 md:p-8">
               {/* Calculator Options */}
-              <div className="space-y-6 mb-8">
+              <div className="space-y-6 mb-6">
                 {/* Address Input for Distance */}
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
@@ -582,9 +582,9 @@ export default function HomePage() {
       </section>
 
       {/* NEW: Comparison Section - Save Money vs Full-Service Junk Removal */}
-      <section className="py-16 md:py-24 bg-gray-900 text-white">
+      <section className="py-8 md:py-12 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Save Money vs Full-Service Junk Removal</h2>
             <p className="text-gray-300 text-lg">Why pay more when you can do it yourself and save hundreds?</p>
           </div>
@@ -662,7 +662,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Image Section - The Trailer */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -672,7 +672,7 @@ export default function HomePage() {
               <p className="text-lg text-gray-600 mb-6">
                 Skip the hassle of multiple trips to the dump. Our dump trailer service gives you the flexibility to load at your own pace while we handle all the heavy lifting and disposal.
               </p>
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-6">
                 {[
                   'No need to rent a truck or make trips',
                   'Load at your own pace during rental period',
@@ -703,10 +703,10 @@ export default function HomePage() {
       </section>
 
       {/* Gallery Section - Show the work */}
-      <section className="py-16 md:py-24 bg-gray-100">
+      <section className="py-8 md:py-12 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">See Our Work</h2>
-          <p className="text-center text-gray-600 mb-12">Real jobs. Real results. We handle it all.</p>
+          <p className="text-center text-gray-600 mb-6">Real jobs. Real results. We handle it all.</p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
@@ -744,9 +744,9 @@ export default function HomePage() {
       </section>
 
       {/* What We Haul */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">What We Haul</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-6">What We Haul</h2>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
@@ -790,9 +790,9 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials / Trust Section */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-8 md:py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Why Customers Choose Us</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-6">Why Customers Choose Us</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -817,10 +817,10 @@ export default function HomePage() {
       </section>
 
       {/* Service Area */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 mb-6">
             Proudly serving <span className="font-semibold text-gray-900">Spokane, WA</span> and surrounding communities within a 30-mile radius.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
@@ -832,10 +832,10 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24 bg-gray-900 text-white">
+      <section className="py-8 md:py-12 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Rid of Your Junk?</h2>
-          <p className="text-xl text-gray-300 mb-8">Book your dump trailer today and we'll handle the rest.</p>
+          <p className="text-xl text-gray-300 mb-6">Book your dump trailer today and we'll handle the rest.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/book">
               <Button size="lg" className="w-full sm:w-auto bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
