@@ -261,14 +261,14 @@ export default function HomePage() {
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <Link href="/" className="flex items-center">
               <Image 
                 src="/logo.png" 
                 alt="Easy Load & Dump" 
-                width={180} 
-                height={60} 
-                className="h-12 w-auto"
+                width={220} 
+                height={70} 
+                className="h-16 w-auto"
                 priority
               />
             </Link>
@@ -863,13 +863,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="mb-4">
+              <div className="mb-6">
                 <Image 
                   src="/logo.png" 
                   alt="Easy Load & Dump" 
-                  width={150} 
-                  height={50} 
-                  className="h-12 w-auto"
+                  width={200} 
+                  height={65} 
+                  className="h-16 w-auto"
                 />
               </div>
               <p className="text-gray-400 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
