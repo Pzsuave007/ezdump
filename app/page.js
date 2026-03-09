@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star } from 'lucide-react';
+import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign } from 'lucide-react';
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -151,6 +151,136 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pricing Preview - MOVED UP */}
+      <section className="py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-gray-600 text-lg">No hidden fees. Know what you're paying upfront.</p>
+          </div>
+          
+          <Card className="max-w-md mx-auto shadow-xl">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <div className="text-5xl font-bold text-gray-900">${totalEstimate}</div>
+                <p className="text-gray-600 mt-2">Starting price (2-hour rental)</p>
+              </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-gray-700">
+                  <span>Trailer Rental (2 hrs)</span>
+                  <span>${pricing?.baseRentalFee || 150}</span>
+                </div>
+                <div className="flex justify-between text-gray-700">
+                  <span>Delivery & Pickup</span>
+                  <span>${pricing?.deliveryFee || 50}</span>
+                </div>
+                <div className="flex justify-between text-gray-700">
+                  <span>Dump Fee</span>
+                  <span>${pricing?.dumpFee || 75}</span>
+                </div>
+                <div className="border-t pt-3 flex justify-between font-semibold">
+                  <span>Total</span>
+                  <span className="text-gray-900">${totalEstimate}</span>
+                </div>
+              </div>
+              
+              <Link href="/book">
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">
+                  Book Now
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+          
+          <p className="text-center mt-6 text-gray-600">
+            <Link href="/pricing" className="text-gray-900 hover:text-gray-700 font-medium underline">
+              View full pricing details →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* NEW: Comparison Section - Save Money vs Full-Service Junk Removal */}
+      <section className="py-16 md:py-24 bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Save Money vs Full-Service Junk Removal</h2>
+            <p className="text-gray-300 text-lg">Why pay more when you can do it yourself and save hundreds?</p>
+          </div>
+          
+          <div className="max-w-2xl mx-auto">
+            {/* Comparison Table */}
+            <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
+              <div className="grid grid-cols-2">
+                {/* Header */}
+                <div className="bg-gray-100 p-4 md:p-6 border-b border-r">
+                  <h3 className="font-bold text-gray-900 text-lg md:text-xl">Service</h3>
+                </div>
+                <div className="bg-gray-100 p-4 md:p-6 border-b">
+                  <h3 className="font-bold text-gray-900 text-lg md:text-xl">Average Price</h3>
+                </div>
+                
+                {/* Full Junk Removal Row */}
+                <div className="p-4 md:p-6 border-b border-r flex items-center">
+                  <div>
+                    <p className="font-semibold text-gray-900">Full-Service Junk Removal</p>
+                    <p className="text-sm text-gray-500">They load it for you</p>
+                  </div>
+                </div>
+                <div className="p-4 md:p-6 border-b flex items-center">
+                  <span className="text-2xl md:text-3xl font-bold text-red-600">$450 – $700</span>
+                </div>
+                
+                {/* Dump Trailer Row */}
+                <div className="p-4 md:p-6 border-r flex items-center bg-green-50">
+                  <div>
+                    <p className="font-semibold text-gray-900">Dump Trailer Rental</p>
+                    <p className="text-sm text-gray-500">You load, we haul</p>
+                  </div>
+                </div>
+                <div className="p-4 md:p-6 flex items-center bg-green-50">
+                  <span className="text-2xl md:text-3xl font-bold text-green-600">${totalEstimate} – $350</span>
+                </div>
+              </div>
+              
+              {/* Savings Banner */}
+              <div className="bg-green-600 p-6 text-center">
+                <p className="text-white text-xl md:text-2xl font-bold">
+                  💰 Save $200 – $400 on your cleanout!
+                </p>
+              </div>
+            </div>
+            
+            {/* Benefits */}
+            <div className="mt-10 text-center">
+              <div className="inline-flex flex-col md:flex-row items-center gap-4 md:gap-8">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span className="text-lg">Same result</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span className="text-lg">Half the price</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span className="text-lg">Your pace</span>
+                </div>
+              </div>
+              
+              <div className="mt-8">
+                <Link href="/book">
+                  <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
+                    Start Saving Today <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Image Section - The Trailer */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -193,13 +323,13 @@ export default function HomePage() {
       </section>
 
       {/* Gallery Section - Show the work */}
-      <section className="py-16 md:py-24 bg-gray-900 text-white">
+      <section className="py-16 md:py-24 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">See Our Work</h2>
-          <p className="text-center text-gray-300 mb-12">Real jobs. Real results. We handle it all.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">See Our Work</h2>
+          <p className="text-center text-gray-600 mb-12">Real jobs. Real results. We handle it all.</p>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="relative h-64 rounded-xl overflow-hidden group">
+            <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
                 src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/7qbljwnk_trash-hoard.webp" 
                 alt="Trailer loaded with household junk"
@@ -209,7 +339,7 @@ export default function HomePage() {
                 <span className="text-white font-semibold">Household Cleanout</span>
               </div>
             </div>
-            <div className="relative h-64 rounded-xl overflow-hidden group">
+            <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
                 src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
                 alt="Dump trailer with wood sides"
@@ -219,7 +349,7 @@ export default function HomePage() {
                 <span className="text-white font-semibold">Ready for Your Load</span>
               </div>
             </div>
-            <div className="relative h-64 rounded-xl overflow-hidden group">
+            <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
                 src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/fyw8ooan_images.jfif" 
                 alt="Dump trailer in action"
@@ -279,58 +409,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Preview */}
-      <section className="py-16 md:py-24 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-gray-600 text-lg">No hidden fees. Know what you're paying upfront.</p>
-          </div>
-          
-          <Card className="max-w-md mx-auto shadow-xl">
-            <CardContent className="p-8">
-              <div className="text-center mb-6">
-                <div className="text-5xl font-bold text-gray-900">${totalEstimate}</div>
-                <p className="text-gray-600 mt-2">Starting price (2-hour rental)</p>
-              </div>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-700">
-                  <span>Trailer Rental (2 hrs)</span>
-                  <span>${pricing?.baseRentalFee || 150}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Delivery & Pickup</span>
-                  <span>${pricing?.deliveryFee || 50}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Dump Fee</span>
-                  <span>${pricing?.dumpFee || 75}</span>
-                </div>
-                <div className="border-t pt-3 flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span className="text-gray-900">${totalEstimate}</span>
-                </div>
-              </div>
-              
-              <Link href="/book">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">
-                  Book Now
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-          
-          <p className="text-center mt-6 text-gray-600">
-            <Link href="/pricing" className="text-gray-900 hover:text-gray-700 font-medium underline">
-              View full pricing details →
-            </Link>
-          </p>
-        </div>
-      </section>
-
       {/* Testimonials / Trust Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Why Customers Choose Us</h2>
           
@@ -357,7 +437,7 @@ export default function HomePage() {
       </section>
 
       {/* Service Area */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
           <p className="text-xl text-gray-600 mb-8">
@@ -365,7 +445,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {['Spokane Valley', 'Liberty Lake', 'Cheney', 'Medical Lake', 'Airway Heights', 'Mead', 'Nine Mile Falls', 'Millwood'].map((area) => (
-              <span key={area} className="px-4 py-2 bg-white rounded-full text-gray-700 shadow-sm">{area}</span>
+              <span key={area} className="px-4 py-2 bg-gray-100 rounded-full text-gray-700 shadow-sm">{area}</span>
             ))}
           </div>
         </div>
