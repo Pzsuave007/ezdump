@@ -2,13 +2,46 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, CheckCircle, AlertTriangle, Menu, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Truck, CheckCircle, AlertTriangle, Menu, X, Calculator, MapPin, Clock, Package, ArrowRight, Loader2, AlertCircle, Navigation } from 'lucide-react';
+
+// Office location coordinates (2508 E 5th Ave Spokane WA 99202)
+const OFFICE_LAT = 47.6515;
+const OFFICE_LNG = -117.3985;
+const PHONE_NUMBER = '509-863-3109';
+
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 3959; // Earth's radius in miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
 
 export default function PricingPage() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pricing, setPricing] = useState(null);
+  
+  // Calculator state
+  const [calcDuration, setCalcDuration] = useState('2');
+  const [calcLoadType, setCalcLoadType] = useState('household');
+  
+  // Address/distance state
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [checkingDistance, setCheckingDistance] = useState(false);
+  const [distanceResult, setDistanceResult] = useState(null);
+  const [addressError, setAddressError] = useState('');
 
   useEffect(() => {
     fetch('/api/pricing')
@@ -17,7 +50,126 @@ export default function PricingPage() {
       .catch(err => console.error('Error fetching pricing:', err));
   }, []);
 
-  const baseTotal = pricing ? pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee : 275;
+  const baseTotal = pricing ? pricing.baseRentalFee + 50 + pricing.dumpFee : 214;
+
+  // Clean and normalize address for better geocoding
+  const cleanAddress = (address) => {
+    return address
+      .replace(/\n/g, ', ')
+      .replace(/\s+/g, ' ')
+      .replace(/,\s*,/g, ',')
+      .replace(/^\s*,\s*/, '')
+      .replace(/\s*,\s*$/, '')
+      .trim();
+  };
+
+  // Check distance from address
+  const checkDistance = async () => {
+    if (!customerAddress.trim()) {
+      setAddressError('Please enter your address');
+      return;
+    }
+    
+    setCheckingDistance(true);
+    setAddressError('');
+    setDistanceResult(null);
+    
+    try {
+      let cleanedAddress = cleanAddress(customerAddress);
+      cleanedAddress = cleanedAddress
+        .replace(/\+/g, ' ')
+        .replace(/@[\d.-]+,[\d.-]+/g, '')
+        .trim();
+      
+      let data = null;
+      let searchAddress = cleanedAddress;
+      if (!cleanedAddress.toLowerCase().includes('wa') && !cleanedAddress.toLowerCase().includes('washington')) {
+        searchAddress = cleanedAddress + ', WA';
+      }
+      if (!cleanedAddress.toLowerCase().includes('usa')) {
+        searchAddress = searchAddress + ', USA';
+      }
+      
+      const encodedAddress = encodeURIComponent(searchAddress);
+      let response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&countrycodes=us`,
+        { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
+      );
+      data = await response.json();
+      
+      if (!data || data.length === 0) {
+        const parts = cleanedAddress.split(',').map(p => p.trim());
+        if (parts.length >= 2) {
+          const cityState = parts.slice(-2).join(', ') + ', USA';
+          response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityState)}&limit=1&countrycodes=us`,
+            { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
+          );
+          data = await response.json();
+        }
+      }
+      
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        const miles = calculateDistance(OFFICE_LAT, OFFICE_LNG, parseFloat(lat), parseFloat(lon));
+        
+        let tier, fee, canServe;
+        if (miles <= 20) {
+          tier = 'standard';
+          fee = 50;
+          canServe = true;
+        } else if (miles <= 30) {
+          tier = 'extended';
+          fee = 75;
+          canServe = true;
+        } else if (miles <= 50) {
+          tier = 'far';
+          fee = 100;
+          canServe = true;
+        } else {
+          tier = 'outside';
+          fee = 0;
+          canServe = false;
+        }
+        
+        setDistanceResult({ miles: Math.round(miles * 10) / 10, tier, fee, canServe });
+      } else {
+        setAddressError('Could not find that address. Please check and try again.');
+      }
+    } catch (error) {
+      console.error('Error checking distance:', error);
+      setAddressError('Error checking distance. Please try again.');
+    } finally {
+      setCheckingDistance(false);
+    }
+  };
+
+  // Calculate price based on selections
+  const calculatePrice = () => {
+    if (!pricing) return { base: 99, delivery: 50, dump: 65, extra: 0, total: 214 };
+    
+    const base = pricing.baseRentalFee || 99;
+    const dump = pricing.dumpFee || 65;
+    const extraHourFee = pricing.extraHourFee || 35;
+    const delivery = distanceResult?.fee || 50;
+    const extraHours = Math.max(0, parseInt(calcDuration) - 2);
+    const extraHoursCost = extraHours * extraHourFee;
+    const total = base + delivery + dump + extraHoursCost;
+    
+    return { base, delivery, dump, extraHours, extraHoursCost, total };
+  };
+  
+  const calcPricing = calculatePrice();
+  
+  const handleBookFromCalculator = () => {
+    const params = new URLSearchParams({
+      duration: calcDuration,
+      loadType: calcLoadType,
+      distance: distanceResult?.tier || 'standard',
+      address: customerAddress !== '(Using your current location)' ? customerAddress : ''
+    });
+    router.push(`/book?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -66,7 +218,7 @@ export default function PricingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative bg-black text-white py-16 overflow-hidden">
+      <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg" 
@@ -80,109 +232,214 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Pricing Cards */}
-      <section className="py-16">
+      {/* Interactive Price Calculator */}
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Standard Package */}
-            <Card className="border-2 border-gray-900">
-              <CardHeader className="bg-gray-900 text-white">
-                <CardTitle className="text-center">
-                  <span className="text-lg">Standard Package</span>
-                  <div className="text-4xl font-bold mt-2">${baseTotal}</div>
-                  <span className="text-sm font-normal">2-hour rental</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Trailer Rental (2 hours) - ${pricing?.baseRentalFee || 150}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Delivery & Pickup - ${pricing?.deliveryFee || 50}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Dump/Disposal Fee - ${pricing?.dumpFee || 75}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Standard weight allowance</span>
-                  </li>
-                </ul>
-                <Link href="/book">
-                  <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">Book Now</Button>
-                </Link>
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-gray-900 rounded-full mb-3">
+              <Calculator className="h-7 w-7 text-white" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Price Calculator</h2>
+            <p className="text-gray-600">Enter your address to see your exact price</p>
+          </div>
+          
+          <Card className="max-w-2xl mx-auto shadow-xl">
+            <CardContent className="p-5 md:p-6">
+              {/* Address Input */}
+              <div className="mb-6">
+                <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                  <MapPin className="inline h-4 w-4 mr-1" /> Your Address
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter your address (e.g., 123 Main St, Spokane)"
+                    value={customerAddress}
+                    onChange={(e) => {
+                      setCustomerAddress(e.target.value);
+                      setDistanceResult(null);
+                      setAddressError('');
+                    }}
+                    className="flex-1"
+                  />
+                  <Button onClick={checkDistance} disabled={checkingDistance} variant="outline">
+                    {checkingDistance ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Check'}
+                  </Button>
+                </div>
+                
+                {addressError && (
+                  <p className="text-red-500 text-sm mt-2 flex items-center">
+                    <AlertCircle className="h-4 w-4 mr-1" /> {addressError}
+                  </p>
+                )}
+                
+                {distanceResult && (
+                  <div className={`mt-3 p-3 rounded-lg ${distanceResult.canServe ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                    {distanceResult.canServe ? (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-green-800">
+                            <CheckCircle className="inline h-4 w-4 mr-1" />
+                            {distanceResult.miles} miles away
+                          </p>
+                          <p className="text-sm text-green-600">
+                            {distanceResult.tier === 'standard' && 'Standard service area - $50 delivery'}
+                            {distanceResult.tier === 'extended' && 'Extended area - $75 delivery (+$25)'}
+                            {distanceResult.tier === 'far' && 'Far distance - $100 delivery (+$50)'}
+                          </p>
+                        </div>
+                        <span className="text-xl font-bold text-green-700">${distanceResult.fee}</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="font-medium text-red-800">
+                          <AlertCircle className="inline h-4 w-4 mr-1" />
+                          {distanceResult.miles} miles - Outside Service Area
+                        </p>
+                        <p className="text-sm text-red-600 mt-1">
+                          We typically serve within 50 miles. Please call us to discuss.
+                        </p>
+                        <a href={`tel:${PHONE_NUMBER}`} className="inline-flex items-center mt-2 text-red-800 font-medium">
+                          Call {PHONE_NUMBER}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    <Clock className="inline h-4 w-4 mr-1" /> Rental Duration
+                  </Label>
+                  <Select value={calcDuration} onValueChange={setCalcDuration}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2">2 Hours (Standard)</SelectItem>
+                      <SelectItem value="3">3 Hours (+${pricing?.extraHourFee || 35})</SelectItem>
+                      <SelectItem value="4">4 Hours (+${(pricing?.extraHourFee || 35) * 2})</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    <Package className="inline h-4 w-4 mr-1" /> Type of Load
+                  </Label>
+                  <Select value={calcLoadType} onValueChange={setCalcLoadType}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="household">Household Junk</SelectItem>
+                      <SelectItem value="furniture">Furniture</SelectItem>
+                      <SelectItem value="yard_waste">Yard Waste</SelectItem>
+                      <SelectItem value="construction">Construction Debris</SelectItem>
+                      <SelectItem value="mixed">Mixed Load</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              {/* Price Breakdown */}
+              <div className="bg-gray-50 rounded-xl p-5 mb-5">
+                <h3 className="font-semibold text-gray-900 mb-3">Price Breakdown</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-gray-700">
+                    <span>Trailer Rental (2 hrs base)</span>
+                    <span>${calcPricing.base}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700">
+                    <span>Delivery & Pickup {distanceResult && `(${distanceResult.miles} mi)`}</span>
+                    <span>${calcPricing.delivery}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700">
+                    <span>Dump Fee</span>
+                    <span>${calcPricing.dump}</span>
+                  </div>
+                  {calcPricing.extraHours > 0 && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>Extra Time (+{calcPricing.extraHours} hr{calcPricing.extraHours > 1 ? 's' : ''})</span>
+                      <span>+${calcPricing.extraHoursCost}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-3 flex justify-between">
+                    <span className="text-lg font-bold text-gray-900">Your Total</span>
+                    <span className="text-2xl font-bold text-green-600">${calcPricing.total}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {(!distanceResult || distanceResult.canServe) ? (
+                <Button onClick={handleBookFromCalculator} className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-5" size="lg">
+                  Book Now for ${calcPricing.total} <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              ) : (
+                <a href={`tel:${PHONE_NUMBER}`}>
+                  <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-5" size="lg">
+                    Call Us to Discuss
+                  </Button>
+                </a>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Distance Pricing Tiers */}
+      <section className="py-8 md:py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">Delivery Fee by Distance</h2>
+          
+          <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <Card className="border-green-200">
+              <CardContent className="p-5 text-center">
+                <h3 className="font-semibold text-lg mb-1">0-20 Miles</h3>
+                <p className="text-3xl font-bold text-green-600">$50</p>
+                <p className="text-gray-600 text-sm mt-1">Standard delivery</p>
               </CardContent>
             </Card>
-
-            {/* Extended Package */}
-            <Card>
-              <CardHeader className="bg-gray-700 text-white">
-                <CardTitle className="text-center">
-                  <span className="text-lg">Extended Package</span>
-                  <div className="text-4xl font-bold mt-2">${baseTotal + (pricing?.extraHourFee || 35) * 2}</div>
-                  <span className="text-sm font-normal">4-hour rental</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Everything in Standard</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>+2 Extra Hours - ${(pricing?.extraHourFee || 35) * 2}</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>Perfect for larger cleanouts</span>
-                  </li>
-                  <li className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                    <span>More time to load at your pace</span>
-                  </li>
-                </ul>
-                <Link href="/book">
-                  <Button className="w-full" size="lg" variant="outline">Book Now</Button>
-                </Link>
+            <Card className="border-yellow-200">
+              <CardContent className="p-5 text-center">
+                <h3 className="font-semibold text-lg mb-1">20-30 Miles</h3>
+                <p className="text-3xl font-bold text-yellow-600">$75</p>
+                <p className="text-gray-600 text-sm mt-1">+$25 extended area</p>
+              </CardContent>
+            </Card>
+            <Card className="border-orange-200">
+              <CardContent className="p-5 text-center">
+                <h3 className="font-semibold text-lg mb-1">30-50 Miles</h3>
+                <p className="text-3xl font-bold text-orange-600">$100</p>
+                <p className="text-gray-600 text-sm mt-1">+$50 far distance</p>
               </CardContent>
             </Card>
           </div>
+          <p className="text-center text-gray-500 mt-4 text-sm">Over 50 miles? Call us at {PHONE_NUMBER} to discuss.</p>
         </div>
       </section>
 
       {/* Additional Fees */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Additional Fees</h2>
-          <p className="text-center text-gray-600 mb-8">These fees may apply depending on your specific situation</p>
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">Additional Fees</h2>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Extra Time</h3>
-                <p className="text-3xl font-bold text-gray-900">${pricing?.extraHourFee || 35}<span className="text-sm text-gray-500">/hour</span></p>
-                <p className="text-gray-600 text-sm mt-2">Need more time? No problem!</p>
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-lg mb-1">Extra Time</h3>
+                <p className="text-2xl font-bold text-gray-900">${pricing?.extraHourFee || 35}<span className="text-sm text-gray-500">/hour</span></p>
+                <p className="text-gray-600 text-sm mt-1">Need more time? No problem!</p>
               </CardContent>
             </Card>
-
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Overweight Load</h3>
-                <p className="text-3xl font-bold text-gray-900">${pricing?.overweightFee || 50}+</p>
-                <p className="text-gray-600 text-sm mt-2">If load exceeds weight limit</p>
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-lg mb-1">Overweight Load</h3>
+                <p className="text-2xl font-bold text-gray-900">${pricing?.overweightFee || 50}+</p>
+                <p className="text-gray-600 text-sm mt-1">If load exceeds weight limit</p>
               </CardContent>
             </Card>
-
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Extended Distance</h3>
-                <p className="text-3xl font-bold text-gray-900">${pricing?.travelFee || 25}+</p>
-                <p className="text-gray-600 text-sm mt-2">Outside 30-mile service area</p>
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-lg mb-1">Special Items</h3>
+                <p className="text-2xl font-bold text-gray-900">Varies</p>
+                <p className="text-gray-600 text-sm mt-1">Contact us for pricing</p>
               </CardContent>
             </Card>
           </div>
@@ -190,19 +447,19 @@ export default function PricingPage() {
       </section>
 
       {/* What's Allowed */}
-      <section className="py-16">
+      <section className="py-8 md:py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">What Can You Load?</h2>
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">What Can You Load?</h2>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <Card className="border-green-200">
-              <CardHeader>
-                <CardTitle className="flex items-center text-green-700">
-                  <CheckCircle className="h-6 w-6 mr-2" /> Allowed Items
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-green-700 text-lg">
+                  <CheckCircle className="h-5 w-5 mr-2" /> Allowed Items
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2">
+                <ul className="space-y-1.5 text-sm">
                   {['Household junk & clutter', 'Furniture (couches, beds, tables)', 'Appliances (non-freon)', 'Yard waste & brush', 'Construction debris', 'Wood, drywall, flooring', 'Cardboard & boxes', 'General trash'].map((item) => (
                     <li key={item} className="flex items-center text-gray-700">
                       <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
@@ -214,13 +471,13 @@ export default function PricingPage() {
             </Card>
 
             <Card className="border-red-200">
-              <CardHeader>
-                <CardTitle className="flex items-center text-red-700">
-                  <AlertTriangle className="h-6 w-6 mr-2" /> Prohibited Items
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-red-700 text-lg">
+                  <AlertTriangle className="h-5 w-5 mr-2" /> Prohibited Items
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2">
+                <ul className="space-y-1.5 text-sm">
                   {['Hazardous materials', 'Chemicals & paint', 'Tires', 'Batteries', 'Appliances with freon', 'Medical waste', 'Asbestos materials', 'Flammable liquids'].map((item) => (
                     <li key={item} className="flex items-center text-gray-700">
                       <AlertTriangle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />
@@ -235,12 +492,12 @@ export default function PricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gray-900 text-white">
+      <section className="py-10 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Clear Out Your Space?</h2>
-          <p className="text-xl text-gray-300 mb-8">Book your dump trailer today!</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Clear Out Your Space?</h2>
+          <p className="text-lg text-gray-300 mb-6">Book your dump trailer today!</p>
           <Link href="/book">
-            <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
+            <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-5">
               Book Now
             </Button>
           </Link>
@@ -248,10 +505,10 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-8">
+      <footer className="bg-black text-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
           <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
-          <p className="mt-2">Serving Spokane, WA & surrounding areas</p>
+          <p className="mt-1">Serving Spokane, WA & surrounding areas</p>
         </div>
       </footer>
     </div>

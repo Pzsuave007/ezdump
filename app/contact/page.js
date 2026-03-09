@@ -80,8 +80,8 @@ export default function ContactPage() {
                   <Phone className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Phone</h3>
-                <a href="tel:+15091234567" className="text-gray-900 hover:text-gray-700 text-lg font-medium">
-                  (509) 123-4567
+                <a href="tel:+15098633109" className="text-gray-900 hover:text-gray-700 text-lg font-medium">
+                  (509) 863-3109
                 </a>
                 <p className="text-gray-600 text-sm mt-2">Call or text anytime</p>
               </CardContent>

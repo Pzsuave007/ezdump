@@ -36,7 +36,7 @@ export default function FAQPage() {
     },
     {
       question: 'How much does it cost?',
-      answer: 'Our standard 2-hour rental starts at $275, which includes trailer rental, delivery/pickup, and dump fees. Additional fees may apply for extra time, overweight loads, or extended travel distance. Visit our pricing page for full details.'
+      answer: 'Our standard 2-hour rental starts at $214 (within 20 miles), which includes $99 trailer rental, $50 delivery/pickup, and $65 dump fees. Delivery fees vary by distance ($50 for 0-20 mi, $75 for 20-30 mi, $100 for 30-50 mi). Extra hours are $35/hour. Visit our pricing page for full details and to calculate your exact price.'
     },
     {
       question: 'Do I need to be home during delivery and pickup?',

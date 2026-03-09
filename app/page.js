@@ -842,7 +842,7 @@ export default function HomePage() {
                 Book Online Now
               </Button>
             </Link>
-            <a href="tel:+15091234567">
+            <a href="tel:+15098633109">
               <Button size="lg" className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6">
                 <Phone className="mr-2 h-5 w-5" /> Call Us
               </Button>
@@ -876,7 +876,7 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-4">Contact</h4>
               <div className="space-y-2 text-gray-400">
-                <p className="flex items-center"><Phone className="h-4 w-4 mr-2" /><span>(509) 123-4567</span></p>
+                <p className="flex items-center"><Phone className="h-4 w-4 mr-2" /><span>(509) 863-3109</span></p>
                 <p className="flex items-center"><Mail className="h-4 w-4 mr-2" /><span>info@ezloadndump.com</span></p>
                 <p className="flex items-center"><MapPin className="h-4 w-4 mr-2" /><span>Spokane, WA</span></p>
               </div>
