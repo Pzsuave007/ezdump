@@ -75,8 +75,8 @@ export default function HomePage() {
       <section className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
-            alt="Dump trailer loaded with debris"
+            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+            alt="Clean dump trailer ready for your load"
             className="w-full h-full object-cover opacity-40"
           />
         </div>
