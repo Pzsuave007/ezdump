@@ -14,6 +14,13 @@ import { Badge } from '@/components/ui/badge';
 import { Truck, ArrowLeft, Loader2, ChevronLeft, ChevronRight, Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Distance tier delivery fees
+const DELIVERY_FEES = {
+  standard: 50,   // 0-20 miles
+  extended: 75,   // 20-30 miles (+$25)
+  far: 100        // 30-50 miles (+$50)
+};
+
 export default function BookingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,12 +37,13 @@ export default function BookingPage() {
   const urlDuration = searchParams.get('duration');
   const urlLoadType = searchParams.get('loadType');
   const urlDistance = searchParams.get('distance');
+  const urlAddress = searchParams.get('address');
 
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '',
     email: '',
-    address: '',
+    address: urlAddress || '',
     preferredDate: '',
     preferredTime: '',
     rentalDuration: urlDuration || '2',
@@ -44,20 +52,21 @@ export default function BookingPage() {
     promoCode: '',
     requestType: 'booking',
     agreedToTerms: false,
-    extendedDistance: urlDistance === 'extended'
+    distanceTier: urlDistance || 'standard'
   });
 
   // Update form when URL params change
   useEffect(() => {
-    if (urlDuration || urlLoadType) {
+    if (urlDuration || urlLoadType || urlDistance || urlAddress) {
       setFormData(prev => ({
         ...prev,
         rentalDuration: urlDuration || prev.rentalDuration,
         loadType: urlLoadType || prev.loadType,
-        extendedDistance: urlDistance === 'extended'
+        distanceTier: urlDistance || prev.distanceTier,
+        address: urlAddress || prev.address
       }));
     }
-  }, [urlDuration, urlLoadType, urlDistance]);
+  }, [urlDuration, urlLoadType, urlDistance, urlAddress]);
 
   // Fetch pricing
   useEffect(() => {
@@ -89,13 +98,18 @@ export default function BookingPage() {
     }
   };
 
+  // Get delivery fee based on distance tier
+  const getDeliveryFee = () => {
+    return DELIVERY_FEES[formData.distanceTier] || DELIVERY_FEES.standard;
+  };
+
   const calculateEstimate = () => {
     if (!pricing) return 0;
     const hours = parseInt(formData.rentalDuration);
     const baseHours = 2;
     const extraHours = Math.max(0, hours - baseHours);
-    const travelFee = formData.extendedDistance ? (pricing.travelFee || 50) : 0;
-    return pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee) + travelFee;
+    const deliveryFee = getDeliveryFee();
+    return pricing.baseRentalFee + deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee);
   };
 
   const handleChange = (field, value) => {
@@ -127,10 +141,17 @@ export default function BookingPage() {
 
     setLoading(true);
     try {
+      // Include calculated estimate in the submission
+      const bookingData = {
+        ...formData,
+        estimatedPrice: calculateEstimate(),
+        deliveryFee: getDeliveryFee()
+      };
+      
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(bookingData)
       });
 
       if (!response.ok) {
@@ -569,15 +590,23 @@ export default function BookingPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-gray-700">
                     <span>Trailer Rental</span>
-                    <span>${pricing?.baseRentalFee || 150}</span>
+                    <span>${pricing?.baseRentalFee || 99}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Delivery & Pickup</span>
-                    <span>${pricing?.deliveryFee || 50}</span>
+                    <span>${getDeliveryFee()}</span>
                   </div>
+                  {formData.distanceTier !== 'standard' && (
+                    <div className="flex justify-between text-sm text-gray-500">
+                      <span className="italic">
+                        {formData.distanceTier === 'extended' && '(20-30 miles: +$25)'}
+                        {formData.distanceTier === 'far' && '(30-50 miles: +$50)'}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-700">
                     <span>Dump Fee</span>
-                    <span>${pricing?.dumpFee || 75}</span>
+                    <span>${pricing?.dumpFee || 65}</span>
                   </div>
                   {parseInt(formData.rentalDuration) > 2 && (
                     <div className="flex justify-between text-gray-700">

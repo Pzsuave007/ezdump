@@ -347,7 +347,10 @@ export async function POST(request, { params }) {
         description,
         promoCode,
         requestType,
-        agreedToTerms
+        agreedToTerms,
+        distanceTier,
+        estimatedPrice: clientEstimatedPrice,
+        deliveryFee: clientDeliveryFee
       } = body;
       
       // Validate required fields
@@ -375,13 +378,17 @@ export async function POST(request, { params }) {
         );
       }
       
-      // Get pricing
+      // Get pricing and calculate estimate
       const pricing = await db.collection('pricing_settings').findOne({});
       const hours = parseInt(rentalDuration);
       const baseHours = 2;
       const extraHours = Math.max(0, hours - baseHours);
       
-      const estimatedPrice = pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee);
+      // Use client-provided delivery fee if available (distance-based), otherwise default
+      const deliveryFee = clientDeliveryFee || pricing.deliveryFee;
+      
+      // Use client-provided estimate if available, otherwise calculate
+      const estimatedPrice = clientEstimatedPrice || (pricing.baseRentalFee + deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee));
       
       const booking = {
         id: uuidv4(),
@@ -398,6 +405,8 @@ export async function POST(request, { params }) {
         promoCode: promoCode || '',
         requestType: requestType || 'booking',
         agreedToTerms: agreedToTerms || false,
+        distanceTier: distanceTier || 'standard',
+        deliveryFee,
         status: 'pending',
         estimatedPrice,
         finalPrice: null,
