@@ -181,6 +181,96 @@ export async function GET(request, { params }) {
       return NextResponse.json(bookings, { headers: corsHeaders() });
     }
     
+    // Public availability endpoint for booking calendar
+    if (path === '/availability') {
+      const month = searchParams.get('month');
+      const year = searchParams.get('year');
+      
+      // Define all available time slots
+      const allTimeSlots = [
+        '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM',
+        '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'
+      ];
+      
+      // Max bookings per time slot (can be adjusted in settings)
+      const maxBookingsPerSlot = 2;
+      
+      if (!month || !year) {
+        return NextResponse.json({ error: 'Month and year required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      const startDate = `${year}-${month.padStart(2, '0')}-01`;
+      const endDate = `${year}-${month.padStart(2, '0')}-31`;
+      
+      // Get all bookings for the month (excluding cancelled)
+      const bookings = await db.collection('bookings').find({
+        preferredDate: { $gte: startDate, $lte: endDate },
+        status: { $nin: ['cancelled'] }
+      }).toArray();
+      
+      // Build availability map
+      const availability = {};
+      const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
+      const today = new Date().toISOString().split('T')[0];
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${month.padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // Skip past dates
+        if (dateStr < today) {
+          availability[dateStr] = { available: false, slots: [], isPast: true };
+          continue;
+        }
+        
+        // Check day of week (0 = Sunday, 6 = Saturday)
+        const dayOfWeek = new Date(dateStr).getDay();
+        
+        // Sunday closed
+        if (dayOfWeek === 0) {
+          availability[dateStr] = { available: false, slots: [], reason: 'Closed on Sundays' };
+          continue;
+        }
+        
+        // Saturday limited hours (8am - 4pm)
+        const daySlots = dayOfWeek === 6 
+          ? allTimeSlots.filter(s => !['7:00 AM'].includes(s) && !s.includes('4:00 PM'))
+          : [...allTimeSlots];
+        
+        // Count bookings per time slot for this date
+        const slotCounts = {};
+        daySlots.forEach(slot => slotCounts[slot] = 0);
+        
+        bookings
+          .filter(b => b.preferredDate === dateStr)
+          .forEach(b => {
+            if (slotCounts[b.preferredTime] !== undefined) {
+              slotCounts[b.preferredTime]++;
+            }
+          });
+        
+        // Build available slots
+        const availableSlots = daySlots.map(slot => ({
+          time: slot,
+          available: slotCounts[slot] < maxBookingsPerSlot,
+          spotsLeft: maxBookingsPerSlot - slotCounts[slot]
+        }));
+        
+        const hasAvailability = availableSlots.some(s => s.available);
+        
+        availability[dateStr] = {
+          available: hasAvailability,
+          slots: availableSlots,
+          totalAvailable: availableSlots.filter(s => s.available).length
+        };
+      }
+      
+      return NextResponse.json({ 
+        month: parseInt(month), 
+        year: parseInt(year), 
+        availability 
+      }, { headers: corsHeaders() });
+    }
+    
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders() });
   } catch (error) {
     console.error('GET Error:', error);
