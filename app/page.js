@@ -383,7 +383,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <a href="tel:+15091234567">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 text-lg px-8 py-6">
+              <Button size="lg" className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6">
                 <Phone className="mr-2 h-5 w-5" /> Call Us
               </Button>
             </a>
