@@ -1,5 +1,5 @@
 #!/bin/bash
-# Fix script for Easy Load & Dump setup
+# Fix script v2 - Easy Load & Dump
 
 echo "Fixing Easy Load & Dump installation..."
 
@@ -34,6 +34,26 @@ EMAIL_FROM_ADDRESS=bookings@ezloadndump.com
 CORS_ORIGINS=https://ezloadndump.com
 EOF
 
+# Create systemd service
+cat > /etc/systemd/system/ezloadndump.service << 'EOF'
+[Unit]
+Description=Easy Load & Dump - Dump Trailer Rental
+After=network.target mongod.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ezloadndump
+ExecStart=/usr/bin/yarn start -p 3002
+Restart=always
+RestartSec=10
+EnvironmentFile=/opt/ezloadndump/.env
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 # Install dependencies
 cd /opt/ezloadndump
 yarn install
@@ -41,9 +61,17 @@ yarn install
 # Build
 yarn build
 
-# Restart service
-sudo systemctl restart ezloadndump
+# Enable and start service
+systemctl daemon-reload
+systemctl enable ezloadndump
+systemctl start ezloadndump
 
 echo ""
-echo "✅ Done! Now edit your credentials:"
-echo "   nano /opt/ezloadndump/.env"
+echo "✅ Done!"
+echo ""
+echo "Check status: systemctl status ezloadndump"
+echo "Edit credentials: nano /opt/ezloadndump/.env"
+echo ""
+echo "Apache .htaccess for your domain:"
+echo "RewriteEngine On"
+echo "RewriteRule ^(.*)\$ http://127.0.0.1:3002/\$1 [P,L]"
