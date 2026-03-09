@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Truck, Phone, Mail, MapPin, Clock, Menu, X } from 'lucide-react';
+import Footer from '@/app/components/shared/Footer';
 
 export default function ContactPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -147,37 +148,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Service Areas */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Areas We Serve</h2>
-          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-            We proudly serve Spokane and surrounding communities within a 30-mile radius. Contact us if you're outside our standard service area — we may still be able to help!
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-3">
-            {[
-              'Spokane',
-              'Spokane Valley',
-              'Liberty Lake',
-              'Cheney',
-              'Medical Lake',
-              'Airway Heights',
-              'Mead',
-              'Nine Mile Falls',
-              'Millwood',
-              'Veradale',
-              'Otis Orchards',
-              'Newman Lake'
-            ].map((area) => (
-              <span key={area} className="px-4 py-2 bg-white rounded-full text-gray-700 shadow-sm border hover:shadow-md transition-shadow">
-                {area}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -191,13 +161,8 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
-          <p className="mt-2">Serving Spokane, WA & surrounding areas</p>
-        </div>
-      </footer>
+      {/* Areas We Serve & Footer */}
+      <Footer />
     </div>
   );
 }

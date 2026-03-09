@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Truck, Package, Trash2, Calendar, Clock, CheckCircle, Menu, X } from 'lucide-react';
+import Footer from '@/app/components/shared/Footer';
 
 export default function HowItWorksPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -174,13 +175,8 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
-          <p className="mt-2">Serving Spokane, WA & surrounding areas</p>
-        </div>
-      </footer>
+      {/* Areas We Serve & Footer */}
+      <Footer />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Truck, CheckCircle, AlertTriangle, Menu, X, Calculator, MapPin, Clock, Package, ArrowRight, Loader2, AlertCircle, Navigation } from 'lucide-react';
+import Footer from '@/app/components/shared/Footer';
 
 // Office location coordinates (2508 E 5th Ave Spokane WA 99202)
 const OFFICE_LAT = 47.6515;
@@ -510,13 +511,8 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
-          <p className="mt-1">Serving Spokane, WA & surrounding areas</p>
-        </div>
-      </footer>
+      {/* Areas We Serve & Footer */}
+      <Footer />
     </div>
   );
 }

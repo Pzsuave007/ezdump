@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign, Calculator, Loader2, AlertCircle, Navigation } from 'lucide-react';
+import Footer from '@/app/components/shared/Footer';
 
 // Office location coordinates (2508 E 5th Ave Spokane WA 99202)
 const OFFICE_LAT = 47.6515;
@@ -823,30 +824,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Service Area */}
-      <section className="py-8 md:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <Image 
-              src="/logo.png" 
-              alt="Easy Load & Dump" 
-              width={450} 
-              height={150} 
-              className="h-32 md:h-40 lg:h-48 w-auto mx-auto"
-            />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
-          <p className="text-xl text-gray-600 mb-6">
-            Proudly serving <span className="font-semibold text-gray-900">Spokane, WA</span> and surrounding communities within a 30-mile radius.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {['Spokane Valley', 'Liberty Lake', 'Cheney', 'Medical Lake', 'Airway Heights', 'Mead', 'Nine Mile Falls', 'Millwood'].map((area) => (
-              <span key={area} className="px-4 py-2 bg-gray-100 rounded-full text-gray-700 shadow-sm">{area}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-8 md:py-12 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -867,57 +844,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <div className="mb-6">
-                <Image 
-                  src="/logo.png" 
-                  alt="Easy Load & Dump" 
-                  width={280} 
-                  height={90} 
-                  className="h-24 w-auto"
-                />
-              </div>
-              <p className="text-gray-400 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <div className="space-y-2">
-                <Link href="/how-it-works" className="block text-gray-400 hover:text-white">How It Works</Link>
-                <Link href="/pricing" className="block text-gray-400 hover:text-white">Pricing</Link>
-                <Link href="/book" className="block text-gray-400 hover:text-white">Book Now</Link>
-                <Link href="/faq" className="block text-gray-400 hover:text-white">FAQ</Link>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-400">
-                <p className="flex items-center"><Phone className="h-4 w-4 mr-2" /><span>(509) 863-3109</span></p>
-                <p className="flex items-center"><Mail className="h-4 w-4 mr-2" /><span>info@ezloadndump.com</span></p>
-                <p className="flex items-center"><MapPin className="h-4 w-4 mr-2" /><span>Spokane, WA</span></p>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Hours</h4>
-              <div className="text-gray-400 text-sm">
-                <p>Monday - Friday: 7am - 6pm</p>
-                <p>Saturday: 8am - 4pm</p>
-                <p>Sunday: Closed</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      {/* Areas We Serve & Footer */}
+      <Footer />
     </div>
   );
 }
