@@ -52,6 +52,17 @@ export default function HomePage() {
 
   const totalEstimate = pricing ? pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee : 275;
   
+  // Clean and normalize address for better geocoding
+  const cleanAddress = (address) => {
+    return address
+      .replace(/\n/g, ', ')           // Replace newlines with commas
+      .replace(/\s+/g, ' ')           // Normalize whitespace
+      .replace(/,\s*,/g, ',')         // Remove double commas
+      .replace(/^\s*,\s*/, '')        // Remove leading commas
+      .replace(/\s*,\s*$/, '')        // Remove trailing commas
+      .trim();
+  };
+
   // Check distance from address
   const checkDistance = async () => {
     if (!customerAddress.trim()) {
@@ -64,14 +75,63 @@ export default function HomePage() {
     setDistanceResult(null);
     
     try {
-      // Use Nominatim (OpenStreetMap) for free geocoding
-      const encodedAddress = encodeURIComponent(customerAddress + ', WA, USA');
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+      // Clean the address
+      let cleanedAddress = cleanAddress(customerAddress);
+      
+      // Remove common Google Maps artifacts
+      cleanedAddress = cleanedAddress
+        .replace(/\+/g, ' ')          // Replace + with space
+        .replace(/@[\d.-]+,[\d.-]+/g, '') // Remove coordinates like @47.123,-117.456
+        .replace(/\d+°\d+'[\d.]+"[NS]\s+\d+°\d+'[\d.]+"[EW]/g, '') // Remove GPS coords
+        .trim();
+      
+      // Try multiple search strategies
+      let data = null;
+      
+      // Strategy 1: Full address with state
+      let searchAddress = cleanedAddress;
+      if (!cleanedAddress.toLowerCase().includes('wa') && !cleanedAddress.toLowerCase().includes('washington')) {
+        searchAddress = cleanedAddress + ', WA';
+      }
+      if (!cleanedAddress.toLowerCase().includes('usa') && !cleanedAddress.toLowerCase().includes('united states')) {
+        searchAddress = searchAddress + ', USA';
+      }
+      
+      const encodedAddress = encodeURIComponent(searchAddress);
+      let response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&countrycodes=us`,
         { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
       );
+      data = await response.json();
       
-      const data = await response.json();
+      // Strategy 2: If no result, try with just city/state (extract from address)
+      if (!data || data.length === 0) {
+        // Try to extract city name from address
+        const parts = cleanedAddress.split(',').map(p => p.trim());
+        if (parts.length >= 2) {
+          // Try last two parts (likely city, state)
+          const cityState = parts.slice(-2).join(', ') + ', USA';
+          response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityState)}&limit=1&countrycodes=us`,
+            { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
+          );
+          data = await response.json();
+        }
+      }
+      
+      // Strategy 3: Try structured search
+      if (!data || data.length === 0) {
+        const parts = cleanedAddress.split(',').map(p => p.trim());
+        if (parts.length >= 1) {
+          // Extract potential city (often the second part after street)
+          const potentialCity = parts.length > 1 ? parts[1] : parts[0];
+          response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&city=${encodeURIComponent(potentialCity)}&state=Washington&country=USA&limit=1`,
+            { headers: { 'User-Agent': 'EasyLoadAndDump/1.0' } }
+          );
+          data = await response.json();
+        }
+      }
       
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
