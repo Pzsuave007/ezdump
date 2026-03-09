@@ -1,0 +1,11 @@
+# Easy Load & Dump - .htaccess
+# Routes all requests through the PHP proxy
+
+RewriteEngine On
+
+# Don't rewrite requests for existing files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything through index.php
+RewriteRule ^(.*)$ index.php [L,QSA]
