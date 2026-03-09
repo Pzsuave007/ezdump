@@ -826,13 +826,13 @@ export default function HomePage() {
       {/* Service Area */}
       <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-6">
+          <div className="mb-8">
             <Image 
               src="/logo.png" 
               alt="Easy Load & Dump" 
-              width={280} 
-              height={90} 
-              className="h-20 md:h-24 w-auto mx-auto"
+              width={450} 
+              height={150} 
+              className="h-32 md:h-40 lg:h-48 w-auto mx-auto"
             />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
