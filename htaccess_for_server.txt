@@ -1,0 +1,7 @@
+# Easy Load & Dump - Apache Configuration
+# Place this file in your domain's document root (public_html)
+
+RewriteEngine On
+
+# Proxy all requests to the Node.js app running on port 3002
+RewriteRule ^(.*)$ http://127.0.0.1:3002/$1 [P,L]

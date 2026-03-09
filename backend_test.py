@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base configuration
-BASE_URL = "https://trailer-rental-2.preview.emergentagent.com"
+BASE_URL = "https://ez-load-booking.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test data - realistic dump trailer rental data
