@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star, DollarSign, Calculator } from 'lucide-react';
 
 export default function HomePage() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pricing, setPricing] = useState(null);
+  
+  // Calculator state
+  const [calcDuration, setCalcDuration] = useState('2');
+  const [calcLoadType, setCalcLoadType] = useState('household');
+  const [calcDistance, setCalcDistance] = useState('standard');
 
   useEffect(() => {
     fetch('/api/pricing')
@@ -18,6 +27,48 @@ export default function HomePage() {
   }, []);
 
   const totalEstimate = pricing ? pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee : 275;
+  
+  // Calculate price based on selections
+  const calculatePrice = () => {
+    if (!pricing) return { base: 99, delivery: 50, dump: 65, extra: 0, travel: 0, total: 214 };
+    
+    const base = pricing.baseRentalFee || 99;
+    const delivery = pricing.deliveryFee || 50;
+    const dump = pricing.dumpFee || 65;
+    const extraHourFee = pricing.extraHourFee || 35;
+    const travelFee = pricing.travelFee || 50;
+    
+    // Extra hours calculation
+    const extraHours = Math.max(0, parseInt(calcDuration) - 2);
+    const extraHoursCost = extraHours * extraHourFee;
+    
+    // Travel fee for extended distance
+    const travelCost = calcDistance === 'extended' ? travelFee : 0;
+    
+    const total = base + delivery + dump + extraHoursCost + travelCost;
+    
+    return {
+      base,
+      delivery,
+      dump,
+      extraHours,
+      extraHoursCost,
+      travelCost,
+      total
+    };
+  };
+  
+  const calcPricing = calculatePrice();
+  
+  // Handle book now with calculator selections
+  const handleBookFromCalculator = () => {
+    const params = new URLSearchParams({
+      duration: calcDuration,
+      loadType: calcLoadType,
+      distance: calcDistance
+    });
+    router.push(`/book?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -151,53 +202,124 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Preview - MOVED UP */}
+      {/* Interactive Price Calculator - MOVED UP */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-gray-600 text-lg">No hidden fees. Know what you're paying upfront.</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-4">
+              <Calculator className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Price Calculator</h2>
+            <p className="text-gray-600 text-lg">Customize your rental and see your exact price instantly</p>
           </div>
           
-          <Card className="max-w-md mx-auto shadow-xl">
-            <CardContent className="p-8">
-              <div className="text-center mb-6">
-                <div className="text-5xl font-bold text-gray-900">${totalEstimate}</div>
-                <p className="text-gray-600 mt-2">Starting price (2-hour rental)</p>
+          <Card className="max-w-2xl mx-auto shadow-xl">
+            <CardContent className="p-6 md:p-8">
+              {/* Calculator Options */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                {/* Duration */}
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Rental Duration</Label>
+                  <Select value={calcDuration} onValueChange={setCalcDuration}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2">2 Hours (Standard)</SelectItem>
+                      <SelectItem value="3">3 Hours (+${pricing?.extraHourFee || 35})</SelectItem>
+                      <SelectItem value="4">4 Hours (+${(pricing?.extraHourFee || 35) * 2})</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Load Type */}
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Type of Load</Label>
+                  <Select value={calcLoadType} onValueChange={setCalcLoadType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="household">Household Junk</SelectItem>
+                      <SelectItem value="furniture">Furniture</SelectItem>
+                      <SelectItem value="yard_waste">Yard Waste</SelectItem>
+                      <SelectItem value="construction">Construction Debris</SelectItem>
+                      <SelectItem value="mixed">Mixed Load</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Distance */}
+                <div>
+                  <Label className="text-sm font-semibold text-gray-700 mb-2 block">Your Location</Label>
+                  <Select value={calcDistance} onValueChange={setCalcDistance}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Within 20 miles</SelectItem>
+                      <SelectItem value="extended">20-30 miles (+${pricing?.travelFee || 50})</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-700">
-                  <span>Trailer Rental (2 hrs)</span>
-                  <span>${pricing?.baseRentalFee || 150}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Delivery & Pickup</span>
-                  <span>${pricing?.deliveryFee || 50}</span>
-                </div>
-                <div className="flex justify-between text-gray-700">
-                  <span>Dump Fee</span>
-                  <span>${pricing?.dumpFee || 75}</span>
-                </div>
-                <div className="border-t pt-3 flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span className="text-gray-900">${totalEstimate}</span>
+              {/* Price Breakdown */}
+              <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-gray-700">
+                    <span>Trailer Rental (2 hrs base)</span>
+                    <span>${calcPricing.base}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700">
+                    <span>Delivery & Pickup</span>
+                    <span>${calcPricing.delivery}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700">
+                    <span>Dump Fee</span>
+                    <span>${calcPricing.dump}</span>
+                  </div>
+                  {calcPricing.extraHours > 0 && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>Extra Time (+{calcPricing.extraHours} hr{calcPricing.extraHours > 1 ? 's' : ''})</span>
+                      <span>+${calcPricing.extraHoursCost}</span>
+                    </div>
+                  )}
+                  {calcPricing.travelCost > 0 && (
+                    <div className="flex justify-between text-gray-700">
+                      <span>Extended Travel Fee</span>
+                      <span>+${calcPricing.travelCost}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-3 flex justify-between">
+                    <span className="text-xl font-bold text-gray-900">Your Total</span>
+                    <span className="text-3xl font-bold text-green-600">${calcPricing.total}</span>
+                  </div>
                 </div>
               </div>
               
-              <Link href="/book">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">
-                  Book Now
-                </Button>
-              </Link>
+              {/* Book Now Button */}
+              <Button 
+                onClick={handleBookFromCalculator}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6"
+                size="lg"
+              >
+                Book Now for ${calcPricing.total} <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              
+              <p className="text-center text-sm text-gray-500 mt-4">
+                No payment required now. We'll confirm your booking first.
+              </p>
             </CardContent>
           </Card>
           
-          <p className="text-center mt-6 text-gray-600">
-            <Link href="/pricing" className="text-gray-900 hover:text-gray-700 font-medium underline">
-              View full pricing details →
+          <div className="text-center mt-8">
+            <p className="text-gray-600 mb-2">Need something different?</p>
+            <Link href="/contact" className="text-gray-900 hover:text-gray-700 font-medium underline">
+              Contact us for a custom quote →
             </Link>
-          </p>
+          </div>
         </div>
       </section>
 

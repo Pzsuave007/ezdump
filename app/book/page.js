@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 export default function BookingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [pricing, setPricing] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -25,6 +26,11 @@ export default function BookingPage() {
   const [selectedTime, setSelectedTime] = useState(null);
   const [step, setStep] = useState(1); // 1 = calendar, 2 = time slots, 3 = form
 
+  // Get calculator params from URL
+  const urlDuration = searchParams.get('duration');
+  const urlLoadType = searchParams.get('loadType');
+  const urlDistance = searchParams.get('distance');
+
   const [formData, setFormData] = useState({
     customerName: '',
     phone: '',
@@ -32,13 +38,26 @@ export default function BookingPage() {
     address: '',
     preferredDate: '',
     preferredTime: '',
-    rentalDuration: '2',
-    loadType: '',
+    rentalDuration: urlDuration || '2',
+    loadType: urlLoadType || '',
     description: '',
     promoCode: '',
     requestType: 'booking',
-    agreedToTerms: false
+    agreedToTerms: false,
+    extendedDistance: urlDistance === 'extended'
   });
+
+  // Update form when URL params change
+  useEffect(() => {
+    if (urlDuration || urlLoadType) {
+      setFormData(prev => ({
+        ...prev,
+        rentalDuration: urlDuration || prev.rentalDuration,
+        loadType: urlLoadType || prev.loadType,
+        extendedDistance: urlDistance === 'extended'
+      }));
+    }
+  }, [urlDuration, urlLoadType, urlDistance]);
 
   // Fetch pricing
   useEffect(() => {
@@ -75,7 +94,8 @@ export default function BookingPage() {
     const hours = parseInt(formData.rentalDuration);
     const baseHours = 2;
     const extraHours = Math.max(0, hours - baseHours);
-    return pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee);
+    const travelFee = formData.extendedDistance ? (pricing.travelFee || 50) : 0;
+    return pricing.baseRentalFee + pricing.deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee) + travelFee;
   };
 
   const handleChange = (field, value) => {
