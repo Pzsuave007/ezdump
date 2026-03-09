@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Truck, Calendar, Users, Settings, ClipboardList, DollarSign, Clock, CheckCircle, AlertCircle, LogOut, Menu, X, ChevronRight } from 'lucide-react';
+import { Truck, Calendar, Users, Settings, ClipboardList, DollarSign, Clock, CheckCircle, AlertCircle, LogOut, Menu, X, ChevronRight, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminDashboardPage() {
@@ -81,6 +81,9 @@ export default function AdminDashboardPage() {
         </Link>
         <Link href="/admin/customers" className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <Users className="h-5 w-5 mr-3" /> Customers
+        </Link>
+        <Link href="/admin/emails" className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
+          <Mail className="h-5 w-5 mr-3" /> Emails
         </Link>
         <Link href="/admin/settings" className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <Settings className="h-5 w-5 mr-3" /> Settings

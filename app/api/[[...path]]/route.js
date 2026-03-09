@@ -3,6 +3,13 @@ import { getDb } from '@/lib/mongodb';
 import { hashPassword, verifyPassword, generateToken } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
 import Stripe from 'stripe';
+import { 
+  sendBookingConfirmation, 
+  sendDayOfReminder, 
+  sendJobCompletedEmail,
+  testEmailConnection,
+  isEmailConfigured 
+} from '@/lib/email';
 
 // Initialize Stripe with integration proxy
 const INTEGRATION_PROXY_URL = process.env.INTEGRATION_PROXY_URL || 'https://integrations.emergentagent.com';
@@ -305,6 +312,44 @@ export async function GET(request, { params }) {
       }, { headers: corsHeaders() });
     }
     
+    // Get email settings (admin)
+    if (path === '/email/settings') {
+      let settings = await db.collection('email_settings').findOne({});
+      if (!settings) {
+        // Create default settings
+        settings = {
+          id: uuidv4(),
+          confirmationEnabled: true,
+          reminderEnabled: true,
+          reminderTime: '07:00', // 7 AM
+          followupEnabled: true,
+          followupDelay: 1, // 1 day after completion
+          isConfigured: isEmailConfigured(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        await db.collection('email_settings').insertOne(settings);
+      }
+      settings.isConfigured = isEmailConfigured();
+      return NextResponse.json(settings, { headers: corsHeaders() });
+    }
+    
+    // Get email logs (admin)
+    if (path === '/email/logs') {
+      const logs = await db.collection('email_logs')
+        .find({})
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .toArray();
+      return NextResponse.json(logs, { headers: corsHeaders() });
+    }
+    
+    // Test email connection
+    if (path === '/email/test') {
+      const result = await testEmailConnection();
+      return NextResponse.json(result, { headers: corsHeaders() });
+    }
+    
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders() });
   } catch (error) {
     console.error('GET Error:', error);
@@ -433,6 +478,37 @@ export async function POST(request, { params }) {
       };
       
       await db.collection('bookings').insertOne(booking);
+      
+      // Check email automation settings and send confirmation email
+      const emailSettings = await db.collection('email_settings').findOne({});
+      if (emailSettings?.confirmationEnabled !== false) {
+        // Send booking confirmation email (async, don't wait)
+        sendBookingConfirmation(booking).then(result => {
+          if (result.success) {
+            // Log successful email
+            db.collection('email_logs').insertOne({
+              id: uuidv4(),
+              bookingId: booking.id,
+              type: 'booking_confirmation',
+              to: booking.email,
+              status: 'sent',
+              messageId: result.messageId,
+              createdAt: new Date()
+            });
+          } else {
+            // Log failed email
+            db.collection('email_logs').insertOne({
+              id: uuidv4(),
+              bookingId: booking.id,
+              type: 'booking_confirmation',
+              to: booking.email,
+              status: result.demo ? 'demo' : 'failed',
+              error: result.error,
+              createdAt: new Date()
+            });
+          }
+        }).catch(console.error);
+      }
       
       return NextResponse.json(booking, { status: 201, headers: corsHeaders() });
     }
@@ -614,6 +690,203 @@ export async function POST(request, { params }) {
       // For webhooks, we need raw body - but in this simplified version, 
       // we rely on polling for status updates
       return NextResponse.json({ received: true }, { headers: corsHeaders() });
+    }
+    
+    // Update email settings
+    if (path === '/email/settings') {
+      const { confirmationEnabled, reminderEnabled, reminderTime, followupEnabled, followupDelay } = body;
+      
+      const updateData = {
+        updatedAt: new Date()
+      };
+      
+      if (typeof confirmationEnabled === 'boolean') updateData.confirmationEnabled = confirmationEnabled;
+      if (typeof reminderEnabled === 'boolean') updateData.reminderEnabled = reminderEnabled;
+      if (reminderTime) updateData.reminderTime = reminderTime;
+      if (typeof followupEnabled === 'boolean') updateData.followupEnabled = followupEnabled;
+      if (typeof followupDelay === 'number') updateData.followupDelay = followupDelay;
+      
+      await db.collection('email_settings').updateOne(
+        {},
+        { $set: updateData },
+        { upsert: true }
+      );
+      
+      const settings = await db.collection('email_settings').findOne({});
+      settings.isConfigured = isEmailConfigured();
+      return NextResponse.json(settings, { headers: corsHeaders() });
+    }
+    
+    // Send test email
+    if (path === '/email/test') {
+      const { email, type } = body;
+      
+      if (!email) {
+        return NextResponse.json({ error: 'Email address required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      // Create a dummy booking for the test
+      const testBooking = {
+        id: 'test-booking',
+        customerName: 'Test Customer',
+        email: email,
+        phone: '(509) 555-1234',
+        address: '123 Test Street, Spokane, WA 99201',
+        preferredDate: new Date().toISOString().split('T')[0],
+        preferredTime: '9:00 AM',
+        rentalDuration: 2,
+        loadType: 'household',
+        estimatedPrice: 214,
+      };
+      
+      let result;
+      switch (type) {
+        case 'reminder':
+          result = await sendDayOfReminder(testBooking);
+          break;
+        case 'followup':
+          result = await sendJobCompletedEmail(testBooking);
+          break;
+        case 'confirmation':
+        default:
+          result = await sendBookingConfirmation(testBooking);
+          break;
+      }
+      
+      // Log the test email
+      await db.collection('email_logs').insertOne({
+        id: uuidv4(),
+        bookingId: 'test',
+        type: `test_${type || 'confirmation'}`,
+        to: email,
+        status: result.success ? 'sent' : (result.demo ? 'demo' : 'failed'),
+        messageId: result.messageId,
+        error: result.error,
+        createdAt: new Date()
+      });
+      
+      return NextResponse.json(result, { headers: corsHeaders() });
+    }
+    
+    // Manually trigger email for a booking
+    if (path === '/email/send') {
+      const { bookingId, type } = body;
+      
+      if (!bookingId || !type) {
+        return NextResponse.json({ error: 'Booking ID and email type required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      const booking = await db.collection('bookings').findOne({ id: bookingId });
+      if (!booking) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404, headers: corsHeaders() });
+      }
+      
+      let result;
+      switch (type) {
+        case 'reminder':
+          result = await sendDayOfReminder(booking);
+          break;
+        case 'followup':
+          result = await sendJobCompletedEmail(booking);
+          break;
+        case 'confirmation':
+        default:
+          result = await sendBookingConfirmation(booking);
+          break;
+      }
+      
+      // Log the email
+      await db.collection('email_logs').insertOne({
+        id: uuidv4(),
+        bookingId: bookingId,
+        type: type,
+        to: booking.email,
+        status: result.success ? 'sent' : (result.demo ? 'demo' : 'failed'),
+        messageId: result.messageId,
+        error: result.error,
+        createdAt: new Date()
+      });
+      
+      return NextResponse.json(result, { headers: corsHeaders() });
+    }
+    
+    // Process scheduled emails (called by cron or manually)
+    if (path === '/email/process-scheduled') {
+      const settings = await db.collection('email_settings').findOne({});
+      const today = new Date().toISOString().split('T')[0];
+      const results = { reminders: 0, followups: 0, errors: [] };
+      
+      // Process day-of reminders
+      if (settings?.reminderEnabled !== false) {
+        const todayBookings = await db.collection('bookings').find({
+          preferredDate: today,
+          status: { $in: ['pending', 'confirmed'] }
+        }).toArray();
+        
+        for (const booking of todayBookings) {
+          // Check if reminder already sent
+          const existingReminder = await db.collection('email_logs').findOne({
+            bookingId: booking.id,
+            type: 'reminder',
+            createdAt: { $gte: new Date(today) }
+          });
+          
+          if (!existingReminder) {
+            const result = await sendDayOfReminder(booking);
+            await db.collection('email_logs').insertOne({
+              id: uuidv4(),
+              bookingId: booking.id,
+              type: 'reminder',
+              to: booking.email,
+              status: result.success ? 'sent' : (result.demo ? 'demo' : 'failed'),
+              messageId: result.messageId,
+              error: result.error,
+              createdAt: new Date()
+            });
+            if (result.success) results.reminders++;
+            else results.errors.push({ bookingId: booking.id, type: 'reminder', error: result.error });
+          }
+        }
+      }
+      
+      // Process follow-up emails for completed jobs
+      if (settings?.followupEnabled !== false) {
+        const followupDelay = settings?.followupDelay || 1;
+        const followupDate = new Date();
+        followupDate.setDate(followupDate.getDate() - followupDelay);
+        const followupDateStr = followupDate.toISOString().split('T')[0];
+        
+        const completedBookings = await db.collection('bookings').find({
+          status: 'completed',
+          preferredDate: { $lte: followupDateStr }
+        }).toArray();
+        
+        for (const booking of completedBookings) {
+          // Check if followup already sent
+          const existingFollowup = await db.collection('email_logs').findOne({
+            bookingId: booking.id,
+            type: 'followup'
+          });
+          
+          if (!existingFollowup) {
+            const result = await sendJobCompletedEmail(booking);
+            await db.collection('email_logs').insertOne({
+              id: uuidv4(),
+              bookingId: booking.id,
+              type: 'followup',
+              to: booking.email,
+              status: result.success ? 'sent' : (result.demo ? 'demo' : 'failed'),
+              messageId: result.messageId,
+              error: result.error,
+              createdAt: new Date()
+            });
+            if (result.success) results.followups++;
+            else results.errors.push({ bookingId: booking.id, type: 'followup', error: result.error });
+          }
+        }
+      }
+      
+      return NextResponse.json(results, { headers: corsHeaders() });
     }
     
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders() });
