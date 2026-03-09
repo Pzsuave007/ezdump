@@ -58,10 +58,10 @@ export default function AdminDashboardPage() {
   };
 
   const Sidebar = () => (
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-black text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="flex items-center">
-          <Truck className="h-8 w-8 text-blue-500" />
+          <Truck className="h-8 w-8 text-white" />
           <span className="ml-2 font-bold">Admin Panel</span>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="md:hidden">
@@ -87,7 +87,7 @@ export default function AdminDashboardPage() {
         </Link>
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
         <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </button>
@@ -98,7 +98,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -108,12 +108,12 @@ export default function AdminDashboardPage() {
       <Sidebar />
       
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-sm p-4 flex items-center justify-between">
+      <div className="md:hidden bg-black text-white shadow-sm p-4 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}>
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center">
-          <Truck className="h-6 w-6 text-blue-600" />
+          <Truck className="h-6 w-6 text-white" />
           <span className="ml-2 font-bold">Dashboard</span>
         </div>
         <div className="w-6"></div>
@@ -135,8 +135,8 @@ export default function AdminDashboardPage() {
                   <p className="text-sm text-gray-600">Today's Jobs</p>
                   <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats?.todayJobs || 0}</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
             </CardContent>
@@ -163,8 +163,8 @@ export default function AdminDashboardPage() {
                   <p className="text-sm text-gray-600">This Week</p>
                   <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats?.totalJobsThisWeek || 0}</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-gray-900" />
                 </div>
               </div>
             </CardContent>
@@ -273,7 +273,7 @@ export default function AdminDashboardPage() {
               </Link>
               <Link href="/admin/calendar">
                 <Button variant="outline" className="w-full h-20 flex flex-col">
-                  <Calendar className="h-6 w-6 mb-1 text-blue-600" />
+                  <Calendar className="h-6 w-6 mb-1 text-gray-900" />
                   <span className="text-xs">View Calendar</span>
                 </Button>
               </Link>

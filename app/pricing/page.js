@@ -26,18 +26,18 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-blue-600" />
+              <Truck className="h-8 w-8 text-gray-900" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">Home</Link>
-              <Link href="/how-it-works" className="text-gray-700 hover:text-blue-600 font-medium">How It Works</Link>
-              <Link href="/pricing" className="text-blue-600 font-medium">Pricing</Link>
-              <Link href="/faq" className="text-gray-700 hover:text-blue-600 font-medium">FAQ</Link>
-              <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">Home</Link>
+              <Link href="/how-it-works" className="text-gray-700 hover:text-gray-900 font-medium">How It Works</Link>
+              <Link href="/pricing" className="text-gray-900 font-medium">Pricing</Link>
+              <Link href="/faq" className="text-gray-700 hover:text-gray-900 font-medium">FAQ</Link>
+              <Link href="/contact" className="text-gray-700 hover:text-gray-900 font-medium">Contact</Link>
               <Link href="/book">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white">Book Now</Button>
               </Link>
             </div>
 
@@ -52,13 +52,13 @@ export default function PricingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Home</Link>
-              <Link href="/how-it-works" className="block text-gray-700 hover:text-blue-600 font-medium py-2">How It Works</Link>
-              <Link href="/pricing" className="block text-blue-600 font-medium py-2">Pricing</Link>
-              <Link href="/faq" className="block text-gray-700 hover:text-blue-600 font-medium py-2">FAQ</Link>
-              <Link href="/contact" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Contact</Link>
+              <Link href="/" className="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</Link>
+              <Link href="/how-it-works" className="block text-gray-700 hover:text-gray-900 font-medium py-2">How It Works</Link>
+              <Link href="/pricing" className="block text-gray-900 font-medium py-2">Pricing</Link>
+              <Link href="/faq" className="block text-gray-700 hover:text-gray-900 font-medium py-2">FAQ</Link>
+              <Link href="/contact" className="block text-gray-700 hover:text-gray-900 font-medium py-2">Contact</Link>
               <Link href="/book" className="block">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">Book Now</Button>
               </Link>
             </div>
           </div>
@@ -66,10 +66,17 @@ export default function PricingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative bg-black text-white py-16 overflow-hidden">
+        <div className="absolute inset-0">
+          <img 
+            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg" 
+            alt="Dump trailer"
+            className="w-full h-full object-cover opacity-30"
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-blue-100">No hidden fees. Know exactly what you're paying.</p>
+          <p className="text-xl text-gray-300">No hidden fees. Know exactly what you're paying.</p>
         </div>
       </section>
 
@@ -78,8 +85,8 @@ export default function PricingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Standard Package */}
-            <Card className="border-2 border-blue-600">
-              <CardHeader className="bg-blue-600 text-white">
+            <Card className="border-2 border-gray-900">
+              <CardHeader className="bg-gray-900 text-white">
                 <CardTitle className="text-center">
                   <span className="text-lg">Standard Package</span>
                   <div className="text-4xl font-bold mt-2">${baseTotal}</div>
@@ -106,14 +113,14 @@ export default function PricingPage() {
                   </li>
                 </ul>
                 <Link href="/book">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="lg">Book Now</Button>
+                  <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">Book Now</Button>
                 </Link>
               </CardContent>
             </Card>
 
             {/* Extended Package */}
             <Card>
-              <CardHeader className="bg-gray-800 text-white">
+              <CardHeader className="bg-gray-700 text-white">
                 <CardTitle className="text-center">
                   <span className="text-lg">Extended Package</span>
                   <div className="text-4xl font-bold mt-2">${baseTotal + (pricing?.extraHourFee || 35) * 2}</div>
@@ -158,7 +165,7 @@ export default function PricingPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-lg mb-2">Extra Time</h3>
-                <p className="text-3xl font-bold text-blue-600">${pricing?.extraHourFee || 35}<span className="text-sm text-gray-500">/hour</span></p>
+                <p className="text-3xl font-bold text-gray-900">${pricing?.extraHourFee || 35}<span className="text-sm text-gray-500">/hour</span></p>
                 <p className="text-gray-600 text-sm mt-2">Need more time? No problem!</p>
               </CardContent>
             </Card>
@@ -166,7 +173,7 @@ export default function PricingPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-lg mb-2">Overweight Load</h3>
-                <p className="text-3xl font-bold text-blue-600">${pricing?.overweightFee || 50}+</p>
+                <p className="text-3xl font-bold text-gray-900">${pricing?.overweightFee || 50}+</p>
                 <p className="text-gray-600 text-sm mt-2">If load exceeds weight limit</p>
               </CardContent>
             </Card>
@@ -174,7 +181,7 @@ export default function PricingPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-lg mb-2">Extended Distance</h3>
-                <p className="text-3xl font-bold text-blue-600">${pricing?.travelFee || 25}+</p>
+                <p className="text-3xl font-bold text-gray-900">${pricing?.travelFee || 25}+</p>
                 <p className="text-gray-600 text-sm mt-2">Outside 30-mile service area</p>
               </CardContent>
             </Card>
@@ -233,7 +240,7 @@ export default function PricingPage() {
           <h2 className="text-3xl font-bold mb-4">Ready to Clear Out Your Space?</h2>
           <p className="text-xl text-gray-300 mb-8">Book your dump trailer today!</p>
           <Link href="/book">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6">
+            <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
               Book Now
             </Button>
           </Link>
@@ -241,8 +248,8 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-600">
+      <footer className="bg-black text-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
           <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
           <p className="mt-2">Serving Spokane, WA & surrounding areas</p>
         </div>

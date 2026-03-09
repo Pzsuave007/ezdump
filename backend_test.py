@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base configuration
-BASE_URL = "https://dump-book.preview.emergentagent.com"
+BASE_URL = "https://junk-removal-demo.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test data - realistic dump trailer rental data

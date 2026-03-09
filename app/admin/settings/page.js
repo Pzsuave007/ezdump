@@ -76,10 +76,10 @@ export default function SettingsPage() {
   };
 
   const Sidebar = () => (
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-black text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="flex items-center">
-          <Truck className="h-8 w-8 text-blue-500" />
+          <Truck className="h-8 w-8 text-white" />
           <span className="ml-2 font-bold">Admin Panel</span>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="md:hidden">
@@ -105,7 +105,7 @@ export default function SettingsPage() {
         </Link>
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
         <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </button>
@@ -116,7 +116,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -126,12 +126,12 @@ export default function SettingsPage() {
       <Sidebar />
       
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-sm p-4 flex items-center justify-between">
+      <div className="md:hidden bg-black text-white shadow-sm p-4 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}>
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center">
-          <Settings className="h-6 w-6 text-blue-600" />
+          <Settings className="h-6 w-6 text-white" />
           <span className="ml-2 font-bold">Settings</span>
         </div>
         <div className="w-6"></div>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Settings</h1>
             <p className="text-gray-600">Manage pricing and business settings</p>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleSave} disabled={saving} className="bg-gray-900 hover:bg-gray-800">
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Save Changes
           </Button>
@@ -155,7 +155,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <DollarSign className="h-5 w-5 mr-2 text-blue-600" />
+                <DollarSign className="h-5 w-5 mr-2 text-gray-900" />
                 Pricing Settings
               </CardTitle>
               <CardDescription>Set your base prices for services</CardDescription>
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 <div className="border-t pt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Standard Total</span>
-                    <span className="text-blue-600">
+                    <span className="text-gray-900">
                       ${(pricing?.baseRentalFee || 0) + (pricing?.deliveryFee || 0) + (pricing?.dumpFee || 0)}
                     </span>
                   </div>

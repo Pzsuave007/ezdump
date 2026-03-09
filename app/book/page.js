@@ -91,22 +91,32 @@ export default function BookingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Truck className="h-8 w-8 text-blue-600" />
+              <Truck className="h-8 w-8 text-gray-900" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </Link>
-            <Link href="/" className="text-gray-600 hover:text-blue-600 flex items-center">
+            <Link href="/" className="text-gray-600 hover:text-gray-900 flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" /> Back
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Book Your Dump Trailer</h1>
-          <p className="text-gray-600">Fill out the form below and we'll confirm your booking.</p>
+      {/* Hero Section with Image */}
+      <section className="relative bg-black text-white py-12 overflow-hidden">
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1582513743721-39fc07f676fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwyfHxqdW5rJTIwcmVtb3ZhbHxlbnwwfHx8YmxhY2t8MTc3MzAxOTkxM3ww&ixlib=rb-4.1.0&q=85" 
+            alt="Dump trailer service"
+            className="w-full h-full object-cover opacity-40"
+          />
         </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Book Your Dump Trailer</h1>
+          <p className="text-lg text-gray-300">Fill out the form below and we'll confirm your booking.</p>
+        </div>
+      </section>
 
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-8">
           {/* Booking Form */}
           <div className="md:col-span-2">
@@ -270,7 +280,7 @@ export default function BookingPage() {
                           value="booking"
                           checked={formData.requestType === 'booking'}
                           onChange={(e) => handleChange('requestType', e.target.value)}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-gray-900"
                         />
                         <span>Book Now</span>
                       </label>
@@ -281,7 +291,7 @@ export default function BookingPage() {
                           value="quote"
                           checked={formData.requestType === 'quote'}
                           onChange={(e) => handleChange('requestType', e.target.value)}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-gray-900"
                         />
                         <span>Request Quote First</span>
                       </label>
@@ -296,13 +306,13 @@ export default function BookingPage() {
                       onCheckedChange={(checked) => handleChange('agreedToTerms', checked)}
                     />
                     <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                      I agree to the <Link href="/faq" className="text-blue-600 hover:underline">terms and conditions</Link>, including the list of prohibited items and weight restrictions.
+                      I agree to the <Link href="/faq" className="text-gray-900 underline hover:text-gray-700">terms and conditions</Link>, including the list of prohibited items and weight restrictions.
                     </label>
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white"
                     size="lg"
                     disabled={loading}
                   >
@@ -346,12 +356,12 @@ export default function BookingPage() {
                   <div className="border-t pt-3">
                     <div className="flex justify-between font-bold text-lg">
                       <span>Estimated Total</span>
-                      <span className="text-blue-600">${calculateEstimate()}</span>
+                      <span className="text-gray-900">${calculateEstimate()}</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
+                <div className="mt-6 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
                   <p className="font-semibold text-gray-800 mb-2">Note:</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Final price may vary based on load weight</li>
@@ -361,6 +371,18 @@ export default function BookingPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Service Image */}
+            <div className="mt-6 rounded-lg overflow-hidden shadow-md">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg"
+                alt="Our dump trailer"
+                className="w-full h-48 object-cover"
+              />
+              <div className="bg-gray-900 text-white p-3 text-center text-sm">
+                Our 14ft dump trailer - ready for your job!
+              </div>
+            </div>
           </div>
         </div>
       </div>

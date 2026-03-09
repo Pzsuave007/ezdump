@@ -26,19 +26,19 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Truck className="h-8 w-8 text-blue-600" />
+              <Truck className="h-8 w-8 text-gray-900" />
               <span className="ml-2 text-xl font-bold text-gray-900">Easy Load & Dump</span>
             </div>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-blue-600 font-medium">Home</Link>
-              <Link href="/how-it-works" className="text-gray-700 hover:text-blue-600 font-medium">How It Works</Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-blue-600 font-medium">Pricing</Link>
-              <Link href="/faq" className="text-gray-700 hover:text-blue-600 font-medium">FAQ</Link>
-              <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">Home</Link>
+              <Link href="/how-it-works" className="text-gray-700 hover:text-gray-900 font-medium">How It Works</Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-gray-900 font-medium">Pricing</Link>
+              <Link href="/faq" className="text-gray-700 hover:text-gray-900 font-medium">FAQ</Link>
+              <Link href="/contact" className="text-gray-700 hover:text-gray-900 font-medium">Contact</Link>
               <Link href="/book">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white">Book Now</Button>
               </Link>
             </div>
 
@@ -58,13 +58,13 @@ export default function HomePage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Home</Link>
-              <Link href="/how-it-works" className="block text-gray-700 hover:text-blue-600 font-medium py-2">How It Works</Link>
-              <Link href="/pricing" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Pricing</Link>
-              <Link href="/faq" className="block text-gray-700 hover:text-blue-600 font-medium py-2">FAQ</Link>
-              <Link href="/contact" className="block text-gray-700 hover:text-blue-600 font-medium py-2">Contact</Link>
+              <Link href="/" className="block text-gray-700 hover:text-gray-900 font-medium py-2">Home</Link>
+              <Link href="/how-it-works" className="block text-gray-700 hover:text-gray-900 font-medium py-2">How It Works</Link>
+              <Link href="/pricing" className="block text-gray-700 hover:text-gray-900 font-medium py-2">Pricing</Link>
+              <Link href="/faq" className="block text-gray-700 hover:text-gray-900 font-medium py-2">FAQ</Link>
+              <Link href="/contact" className="block text-gray-700 hover:text-gray-900 font-medium py-2">Contact</Link>
               <Link href="/book" className="block">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Book Now</Button>
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">Book Now</Button>
               </Link>
             </div>
           </div>
@@ -72,12 +72,12 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white overflow-hidden">
+      <section className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
             alt="Dump trailer loaded with debris"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-40"
           />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
@@ -85,13 +85,13 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Dump Trailer Rental<br />Made Simple
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto">
               We drop it off. You fill it up. We haul it away.<br />
               Junk removal has never been this easy.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/book">
-                <Button size="lg" className="w-full sm:w-auto bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-6">
+                <Button size="lg" className="w-full sm:w-auto bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
                   Book Now <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -101,7 +101,7 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
-            <p className="mt-6 text-blue-100">
+            <p className="mt-6 text-gray-300">
               <MapPin className="inline h-5 w-5 mr-1" /> Serving Spokane, WA & surrounding areas (30 mile radius)
             </p>
           </div>
@@ -115,34 +115,34 @@ export default function HomePage() {
           <p className="text-center text-gray-600 mb-12 text-lg">Simple 3-step process to get rid of your junk</p>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 transition-all hover:shadow-lg">
+            <Card className="text-center p-6 border-2 border-transparent hover:border-gray-300 transition-all hover:shadow-lg">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Truck className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Truck className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">1</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">1</div>
                 <h3 className="text-xl font-semibold mb-2">We Drop Off</h3>
                 <p className="text-gray-600">We deliver our dump trailer right to your driveway at your scheduled time.</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 transition-all hover:shadow-lg">
+            <Card className="text-center p-6 border-2 border-transparent hover:border-gray-300 transition-all hover:shadow-lg">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">2</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">2</div>
                 <h3 className="text-xl font-semibold mb-2">You Fill It</h3>
                 <p className="text-gray-600">Load it up at your own pace with junk, furniture, yard waste, or debris.</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center p-6 border-2 border-transparent hover:border-blue-200 transition-all hover:shadow-lg">
+            <Card className="text-center p-6 border-2 border-transparent hover:border-gray-300 transition-all hover:shadow-lg">
               <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trash2 className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="h-8 w-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">3</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">3</div>
                 <h3 className="text-xl font-semibold mb-2">We Haul Away</h3>
                 <p className="text-gray-600">We come back, pick up the trailer, and take everything to the dump.</p>
               </CardContent>
@@ -176,7 +176,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Link href="/book">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button size="lg" className="bg-gray-900 hover:bg-gray-800 text-white">
                   Get Started Today <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -266,12 +266,12 @@ export default function HomePage() {
           alt="Loaded dump trailer with truck"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Big Loads? No Problem.</h2>
-            <p className="text-xl text-blue-100 mb-6">Our trailer can handle up to 10-12 cubic yards of material</p>
+            <p className="text-xl text-gray-300 mb-6">Our trailer can handle up to 10-12 cubic yards of material</p>
             <Link href="/book">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
                 Book Your Trailer
               </Button>
             </Link>
@@ -280,7 +280,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Preview */}
-      <section className="py-16 md:py-24 bg-blue-50">
+      <section className="py-16 md:py-24 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
@@ -290,7 +290,7 @@ export default function HomePage() {
           <Card className="max-w-md mx-auto shadow-xl">
             <CardContent className="p-8">
               <div className="text-center mb-6">
-                <div className="text-5xl font-bold text-blue-600">${totalEstimate}</div>
+                <div className="text-5xl font-bold text-gray-900">${totalEstimate}</div>
                 <p className="text-gray-600 mt-2">Starting price (2-hour rental)</p>
               </div>
               
@@ -309,12 +309,12 @@ export default function HomePage() {
                 </div>
                 <div className="border-t pt-3 flex justify-between font-semibold">
                   <span>Total</span>
-                  <span className="text-blue-600">${totalEstimate}</span>
+                  <span className="text-gray-900">${totalEstimate}</span>
                 </div>
               </div>
               
               <Link href="/book">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="lg">
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" size="lg">
                   Book Now
                 </Button>
               </Link>
@@ -322,7 +322,7 @@ export default function HomePage() {
           </Card>
           
           <p className="text-center mt-6 text-gray-600">
-            <Link href="/pricing" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/pricing" className="text-gray-900 hover:text-gray-700 font-medium underline">
               View full pricing details →
             </Link>
           </p>
@@ -361,7 +361,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Service Area</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Proudly serving <span className="font-semibold text-blue-600">Spokane, WA</span> and surrounding communities within a 30-mile radius.
+            Proudly serving <span className="font-semibold text-gray-900">Spokane, WA</span> and surrounding communities within a 30-mile radius.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {['Spokane Valley', 'Liberty Lake', 'Cheney', 'Medical Lake', 'Airway Heights', 'Mead', 'Nine Mile Falls', 'Millwood'].map((area) => (
@@ -378,7 +378,7 @@ export default function HomePage() {
           <p className="text-xl text-gray-300 mb-8">Book your dump trailer today and we'll handle the rest.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/book">
-              <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6">
+              <Button size="lg" className="w-full sm:w-auto bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
                 Book Online Now
               </Button>
             </Link>
@@ -392,39 +392,39 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-12">
+      <footer className="bg-black text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center mb-4">
-                <Truck className="h-6 w-6 text-blue-600" />
-                <span className="ml-2 font-bold text-gray-900">Easy Load & Dump</span>
+                <Truck className="h-6 w-6 text-white" />
+                <span className="ml-2 font-bold">Easy Load & Dump</span>
               </div>
-              <p className="text-gray-600 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
+              <p className="text-gray-400 text-sm">Professional dump trailer rental and junk removal services in Spokane, WA.</p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
               <div className="space-y-2">
-                <Link href="/how-it-works" className="block text-gray-600 hover:text-blue-600">How It Works</Link>
-                <Link href="/pricing" className="block text-gray-600 hover:text-blue-600">Pricing</Link>
-                <Link href="/book" className="block text-gray-600 hover:text-blue-600">Book Now</Link>
-                <Link href="/faq" className="block text-gray-600 hover:text-blue-600">FAQ</Link>
+                <Link href="/how-it-works" className="block text-gray-400 hover:text-white">How It Works</Link>
+                <Link href="/pricing" className="block text-gray-400 hover:text-white">Pricing</Link>
+                <Link href="/book" className="block text-gray-400 hover:text-white">Book Now</Link>
+                <Link href="/faq" className="block text-gray-400 hover:text-white">FAQ</Link>
               </div>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-600">
-                <p className="flex items-center"><Phone className="h-4 w-4 mr-2" /> (509) 123-4567</p>
-                <p className="flex items-center"><Mail className="h-4 w-4 mr-2" /> info@ezloadndump.com</p>
-                <p className="flex items-center"><MapPin className="h-4 w-4 mr-2" /> Spokane, WA</p>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <div className="space-y-2 text-gray-400">
+                <p className="flex items-center"><Phone className="h-4 w-4 mr-2" /><span>(509) 123-4567</span></p>
+                <p className="flex items-center"><Mail className="h-4 w-4 mr-2" /><span>info@ezloadndump.com</span></p>
+                <p className="flex items-center"><MapPin className="h-4 w-4 mr-2" /><span>Spokane, WA</span></p>
               </div>
             </div>
             
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Hours</h4>
-              <div className="text-gray-600 text-sm">
+              <h4 className="font-semibold mb-4">Hours</h4>
+              <div className="text-gray-400 text-sm">
                 <p>Monday - Friday: 7am - 6pm</p>
                 <p>Saturday: 8am - 4pm</p>
                 <p>Sunday: Closed</p>
@@ -432,7 +432,7 @@ export default function HomePage() {
             </div>
           </div>
           
-          <div className="border-t mt-8 pt-8 text-center text-gray-600 text-sm">
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
             <p>© {new Date().getFullYear()} Easy Load & Dump. All rights reserved.</p>
           </div>
         </div>

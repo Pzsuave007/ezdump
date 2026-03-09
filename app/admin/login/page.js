@@ -43,11 +43,11 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <Truck className="h-10 w-10 text-blue-600" />
+            <Truck className="h-10 w-10 text-gray-900" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>Easy Load & Dump Dashboard</CardDescription>
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white"
               disabled={loading}
             >
               {loading ? (
@@ -88,7 +88,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
           
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+          <div className="mt-6 p-4 bg-gray-100 rounded-lg text-sm text-gray-600">
             <p className="font-medium mb-1">Default Credentials:</p>
             <p>Username: <code className="bg-gray-200 px-1 rounded">admin</code></p>
             <p>Password: <code className="bg-gray-200 px-1 rounded">admin123</code></p>

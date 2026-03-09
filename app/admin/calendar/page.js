@@ -89,10 +89,10 @@ export default function CalendarPage() {
   };
 
   const Sidebar = () => (
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-black text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="flex items-center">
-          <Truck className="h-8 w-8 text-orange-500" />
+          <Truck className="h-8 w-8 text-white" />
           <span className="ml-2 font-bold">Admin Panel</span>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="md:hidden">
@@ -118,7 +118,7 @@ export default function CalendarPage() {
         </Link>
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
         <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </button>
@@ -131,12 +131,12 @@ export default function CalendarPage() {
       <Sidebar />
       
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-sm p-4 flex items-center justify-between">
+      <div className="md:hidden bg-black text-white shadow-sm p-4 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}>
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center">
-          <Calendar className="h-6 w-6 text-orange-500" />
+          <Calendar className="h-6 w-6 text-white" />
           <span className="ml-2 font-bold">Calendar</span>
         </div>
         <div className="w-6"></div>
@@ -181,9 +181,9 @@ export default function CalendarPage() {
                 return (
                   <div 
                     key={day} 
-                    className={`min-h-[60px] md:min-h-[100px] p-1 md:p-2 rounded border ${isToday(day) ? 'border-orange-500 bg-orange-50' : 'border-gray-200 bg-white'}`}
+                    className={`min-h-[60px] md:min-h-[100px] p-1 md:p-2 rounded border ${isToday(day) ? 'border-gray-900 bg-gray-100' : 'border-gray-200 bg-white'}`}
                   >
-                    <div className={`text-xs md:text-sm font-medium ${isToday(day) ? 'text-orange-500' : 'text-gray-700'}`}>
+                    <div className={`text-xs md:text-sm font-medium ${isToday(day) ? 'text-gray-900' : 'text-gray-700'}`}>
                       {day}
                     </div>
                     <div className="mt-1 space-y-1">

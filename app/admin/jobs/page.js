@@ -67,10 +67,10 @@ export default function JobsPage() {
   };
 
   const Sidebar = () => (
-    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-black text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-200 ease-in-out`}>
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
         <div className="flex items-center">
-          <Truck className="h-8 w-8 text-orange-500" />
+          <Truck className="h-8 w-8 text-white" />
           <span className="ml-2 font-bold">Admin Panel</span>
         </div>
         <button onClick={() => setSidebarOpen(false)} className="md:hidden">
@@ -96,7 +96,7 @@ export default function JobsPage() {
         </Link>
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
         <button onClick={handleLogout} className="flex items-center w-full px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white">
           <LogOut className="h-5 w-5 mr-3" /> Logout
         </button>
@@ -109,12 +109,12 @@ export default function JobsPage() {
       <Sidebar />
       
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-sm p-4 flex items-center justify-between">
+      <div className="md:hidden bg-black text-white shadow-sm p-4 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}>
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center">
-          <Truck className="h-6 w-6 text-orange-500" />
+          <Truck className="h-6 w-6 text-white" />
           <span className="ml-2 font-bold">Jobs</span>
         </div>
         <div className="w-6"></div>
@@ -150,7 +150,7 @@ export default function JobsPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
           </div>
         ) : jobs.length > 0 ? (
           <div className="space-y-4">
@@ -189,7 +189,7 @@ export default function JobsPage() {
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <p className="text-sm text-gray-500">{loadTypeLabels[job.loadType] || job.loadType}</p>
-                          <p className="text-lg font-bold text-orange-500">${job.finalPrice || job.estimatedPrice}</p>
+                          <p className="text-lg font-bold text-gray-900">${job.finalPrice || job.estimatedPrice}</p>
                         </div>
                         <ChevronRight className="h-5 w-5 text-gray-400" />
                       </div>
