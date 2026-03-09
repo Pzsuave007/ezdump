@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Truck, Package, Trash2, Clock, MapPin, Phone, Mail, CheckCircle, ArrowRight, Menu, X, Star } from 'lucide-react';
@@ -74,11 +73,11 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1577075473292-5f62dfae5522?auto=format&fit=crop&w=1920&q=80" 
-            alt="Dump trailer service"
-            className="w-full h-full object-cover"
+            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
+            alt="Dump trailer loaded with debris"
+            className="w-full h-full object-cover opacity-30"
           />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
@@ -152,13 +151,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Image Section */}
+      {/* Featured Image Section - The Trailer */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Professional Junk Removal Service
+                Professional Dump Trailer Rental
               </h2>
               <p className="text-lg text-gray-600 mb-6">
                 Skip the hassle of multiple trips to the dump. Our dump trailer service gives you the flexibility to load at your own pace while we handle all the heavy lifting and disposal.
@@ -184,8 +183,8 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 md:h-[450px] rounded-2xl overflow-hidden shadow-2xl">
               <img 
-                src="https://images.unsplash.com/photo-1595512012432-f165a7026383?auto=format&fit=crop&w=800&q=80" 
-                alt="Professional service truck"
+                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg" 
+                alt="Our dump trailer ready for delivery"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -193,8 +192,49 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Gallery Section - Show the work */}
+      <section className="py-16 md:py-24 bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">See Our Work</h2>
+          <p className="text-center text-gray-300 mb-12">Real jobs. Real results. We handle it all.</p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="relative h-64 rounded-xl overflow-hidden group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/7qbljwnk_trash-hoard.webp" 
+                alt="Trailer loaded with household junk"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                <span className="text-white font-semibold">Household Cleanout</span>
+              </div>
+            </div>
+            <div className="relative h-64 rounded-xl overflow-hidden group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+                alt="Dump trailer with wood sides"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                <span className="text-white font-semibold">Ready for Your Load</span>
+              </div>
+            </div>
+            <div className="relative h-64 rounded-xl overflow-hidden group">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/fyw8ooan_images.jfif" 
+                alt="Dump trailer in action"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
+                <span className="text-white font-semibold">Dump & Disposal</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* What We Haul */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">What We Haul</h2>
           
@@ -207,7 +247,7 @@ export default function HomePage() {
               { title: 'Garage Cleanouts', desc: 'Tools, storage items, old equipment' },
               { title: 'Mixed Loads', desc: 'Combination of different materials' },
             ].map((item, idx) => (
-              <div key={idx} className="flex items-start p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div key={idx} className="flex items-start p-4 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-gray-900">{item.title}</h3>
@@ -215,6 +255,26 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Full Width Image Banner */}
+      <section className="relative h-80 md:h-[400px]">
+        <img 
+          src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
+          alt="Loaded dump trailer with truck"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-blue-900/70 flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Big Loads? No Problem.</h2>
+            <p className="text-xl text-blue-100 mb-6">Our trailer can handle up to 10-12 cubic yards of material</p>
+            <Link href="/book">
+              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+                Book Your Trailer
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
