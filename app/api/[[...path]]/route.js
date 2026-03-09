@@ -186,14 +186,33 @@ export async function GET(request, { params }) {
       const month = searchParams.get('month');
       const year = searchParams.get('year');
       
-      // Define all available time slots
+      // Define all available time slots (in order)
       const allTimeSlots = [
         '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM',
         '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'
       ];
       
-      // Max bookings per time slot (can be adjusted in settings)
-      const maxBookingsPerSlot = 2;
+      // Buffer time for dumping the trailer (in hours)
+      const DUMP_BUFFER_HOURS = 1;
+      
+      // Helper function to get slot index
+      const getSlotIndex = (timeStr) => allTimeSlots.indexOf(timeStr);
+      
+      // Helper function to get slots blocked by a booking
+      // Booking blocks: start_time + rental_duration + dump_buffer
+      const getBlockedSlots = (startTime, rentalDuration) => {
+        const startIndex = getSlotIndex(startTime);
+        if (startIndex === -1) return [];
+        
+        const totalBlockedHours = rentalDuration + DUMP_BUFFER_HOURS;
+        const blockedSlots = [];
+        
+        for (let i = 0; i < totalBlockedHours && (startIndex + i) < allTimeSlots.length; i++) {
+          blockedSlots.push(allTimeSlots[startIndex + i]);
+        }
+        
+        return blockedSlots;
+      };
       
       if (!month || !year) {
         return NextResponse.json({ error: 'Month and year required' }, { status: 400, headers: corsHeaders() });
@@ -231,29 +250,32 @@ export async function GET(request, { params }) {
           continue;
         }
         
-        // Saturday limited hours (8am - 4pm)
+        // Saturday limited hours (8am - 3pm, no 7am or 4pm)
         const daySlots = dayOfWeek === 6 
-          ? allTimeSlots.filter(s => !['7:00 AM'].includes(s) && !s.includes('4:00 PM'))
+          ? allTimeSlots.filter(s => !['7:00 AM', '4:00 PM'].includes(s))
           : [...allTimeSlots];
         
-        // Count bookings per time slot for this date
-        const slotCounts = {};
-        daySlots.forEach(slot => slotCounts[slot] = 0);
+        // Get all bookings for this date and calculate blocked slots
+        const dayBookings = bookings.filter(b => b.preferredDate === dateStr);
         
-        bookings
-          .filter(b => b.preferredDate === dateStr)
-          .forEach(b => {
-            if (slotCounts[b.preferredTime] !== undefined) {
-              slotCounts[b.preferredTime]++;
-            }
-          });
+        // Track which slots are blocked
+        const blockedSlots = new Set();
+        
+        dayBookings.forEach(booking => {
+          const duration = booking.rentalDuration || 2; // Default 2 hours if not set
+          const blocked = getBlockedSlots(booking.preferredTime, duration);
+          blocked.forEach(slot => blockedSlots.add(slot));
+        });
         
         // Build available slots
-        const availableSlots = daySlots.map(slot => ({
-          time: slot,
-          available: slotCounts[slot] < maxBookingsPerSlot,
-          spotsLeft: maxBookingsPerSlot - slotCounts[slot]
-        }));
+        const availableSlots = daySlots.map(slot => {
+          const isBlocked = blockedSlots.has(slot);
+          return {
+            time: slot,
+            available: !isBlocked,
+            spotsLeft: isBlocked ? 0 : 1
+          };
+        });
         
         const hasAvailability = availableSlots.some(s => s.available);
         

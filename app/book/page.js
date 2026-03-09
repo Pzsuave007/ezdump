@@ -226,7 +226,7 @@ export default function BookingPage() {
                   >
                     <span className={`${isToday ? 'font-bold' : ''}`}>{day}</span>
                     {isAvailable && !isSelected && (
-                      <span className="text-[10px] text-green-600">{dayAvailability.totalAvailable} slots</span>
+                      <span className="text-[10px] text-green-600">{dayAvailability.totalAvailable} open</span>
                     )}
                     {isClosed && (
                       <span className="text-[10px]">Closed</span>
@@ -297,7 +297,7 @@ export default function BookingPage() {
                 </div>
                 <div className={`text-xs mt-1 ${selectedTime === slot.time ? 'text-gray-200' : slot.available ? 'text-green-600' : 'text-gray-400'}`}>
                   {slot.available ? (
-                    <><CheckCircle className="h-3 w-3 inline mr-1" />{slot.spotsLeft} spot{slot.spotsLeft > 1 ? 's' : ''} left</>
+                    <><CheckCircle className="h-3 w-3 inline mr-1" />Available</>
                   ) : (
                     <><XCircle className="h-3 w-3 inline mr-1" />Booked</>
                   )}
