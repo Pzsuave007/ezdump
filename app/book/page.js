@@ -492,8 +492,8 @@ export default function BookingPage() {
       <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1582513743721-39fc07f676fa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwyfHxqdW5rJTIwcmVtb3ZhbHxlbnwwfHx8YmxhY2t8MTc3MzAxOTkxM3ww&ixlib=rb-4.1.0&q=85" 
-            alt="Dump trailer service"
+            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+            alt="Dump trailer ready for your load"
             className="w-full h-full object-cover opacity-40"
           />
         </div>
