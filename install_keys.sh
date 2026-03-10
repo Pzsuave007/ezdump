@@ -5,7 +5,8 @@
 # HOW TO USE:
 # 1. Create a file: /home/ezloaduni2/public_html/api_keys.txt
 # 2. Add your keys in this format (one per line):
-#      STRIPE_API_KEY=sk_live_your_key_here
+#      STRIPE_SECRET_KEY=sk_live_your_secret_key_here
+#      STRIPE_PUBLISHABLE_KEY=pk_live_your_publishable_key_here
 #      SMTP_PASS=your_email_password
 # 3. Run this script: sudo ./install_keys.sh
 # 4. The script will add the keys to .env and DELETE the api_keys.txt file for security
@@ -29,7 +30,8 @@ if [ ! -f "$KEYS_FILE" ]; then
     echo "Please create: $KEYS_FILE"
     echo ""
     echo "Add your keys like this (one per line):"
-    echo "   STRIPE_API_KEY=sk_live_xxxxxxxxxxxx"
+    echo "   STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxx"
+    echo "   STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx"
     echo "   SMTP_PASS=your_password"
     echo ""
     exit 1

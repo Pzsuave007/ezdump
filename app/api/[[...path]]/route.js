@@ -11,12 +11,9 @@ import {
   isEmailConfigured 
 } from '@/lib/email';
 
-// Initialize Stripe with integration proxy
-const INTEGRATION_PROXY_URL = process.env.INTEGRATION_PROXY_URL || 'https://integrations.emergentagent.com';
-const stripe = new Stripe(process.env.STRIPE_API_KEY || 'sk_test_emergent', {
+// Initialize Stripe with Secret Key (for server-side operations)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY || 'sk_test_placeholder', {
   apiVersion: '2024-12-18.acacia',
-  // Use integration proxy if available
-  host: INTEGRATION_PROXY_URL ? new URL(INTEGRATION_PROXY_URL).hostname : undefined,
 });
 
 // Deposit amount configuration
@@ -542,12 +539,12 @@ export async function POST(request, { params }) {
       }
       
       // Check if Stripe is properly configured
-      const stripeKey = process.env.STRIPE_API_KEY;
-      if (!stripeKey || stripeKey === 'sk_test_emergent' || stripeKey.length < 20) {
+      const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY;
+      if (!stripeKey || stripeKey === 'sk_test_placeholder' || stripeKey.length < 20) {
         // Return a demo response for testing - indicates Stripe is ready but needs real key
         return NextResponse.json({ 
           demo: true,
-          message: 'Stripe payment integration is ready. Add your Stripe API key to enable live payments.',
+          message: 'Stripe payment integration is ready. Add your Stripe Secret Key to enable live payments.',
           bookingId: bookingId,
           amount: DEPOSIT_AMOUNT
         }, { headers: corsHeaders() });

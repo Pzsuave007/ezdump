@@ -54,8 +54,11 @@ DB_NAME=ezloadndump
 # Your domain
 NEXT_PUBLIC_BASE_URL=https://ezloadndump.com
 
-# Stripe - replace with your real key later
-STRIPE_API_KEY=sk_test_placeholder
+# Stripe Payment Keys (get from https://dashboard.stripe.com/apikeys)
+# Secret Key - starts with sk_live_ (used on server)
+STRIPE_SECRET_KEY=sk_test_placeholder
+# Publishable Key - starts with pk_live_ (used on frontend if needed)
+STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
 
 # Email SMTP - replace with your real credentials later
 SMTP_HOST=mail.ezloadndump.com
