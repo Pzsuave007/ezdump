@@ -551,8 +551,30 @@ export async function POST(request, { params }) {
       }
       
       try {
-        // Create Stripe checkout session
+        // First, create or get Stripe customer
+        let stripeCustomerId = booking.stripeCustomerId;
+        
+        if (!stripeCustomerId) {
+          const customer = await stripe.customers.create({
+            email: booking.email,
+            name: booking.customerName,
+            phone: booking.phone,
+            metadata: {
+              bookingId: bookingId,
+            },
+          });
+          stripeCustomerId = customer.id;
+          
+          // Save customer ID to booking
+          await db.collection('bookings').updateOne(
+            { id: bookingId },
+            { $set: { stripeCustomerId: stripeCustomerId, updatedAt: new Date() } }
+          );
+        }
+        
+        // Create Stripe checkout session with setup_future_usage to save the card
         const session = await stripe.checkout.sessions.create({
+          customer: stripeCustomerId,
           payment_method_types: ['card'],
           line_items: [
             {
@@ -568,6 +590,9 @@ export async function POST(request, { params }) {
             },
           ],
           mode: 'payment',
+          payment_intent_data: {
+            setup_future_usage: 'off_session', // This saves the card for future charges
+          },
           success_url: `${originUrl}/booking-confirmation/${bookingId}?session_id={CHECKOUT_SESSION_ID}&payment=success`,
           cancel_url: `${originUrl}/booking-confirmation/${bookingId}?payment=cancelled`,
           metadata: {
@@ -631,6 +656,10 @@ export async function POST(request, { params }) {
         
         // If payment is successful and not already processed
         if (session.payment_status === 'paid' && transaction && transaction.paymentStatus !== 'completed') {
+          // Get the payment intent to retrieve the payment method
+          const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+          const paymentMethodId = paymentIntent.payment_method;
+          
           // Update payment transaction
           await db.collection('payment_transactions').updateOne(
             { sessionId },
@@ -639,12 +668,13 @@ export async function POST(request, { params }) {
                 status: 'complete',
                 paymentStatus: 'completed',
                 stripePaymentIntentId: session.payment_intent,
+                stripePaymentMethodId: paymentMethodId,
                 updatedAt: new Date() 
               } 
             }
           );
           
-          // Update booking payment status
+          // Update booking payment status with saved payment method
           if (transaction.bookingId) {
             await db.collection('bookings').updateOne(
               { id: transaction.bookingId },
@@ -655,6 +685,8 @@ export async function POST(request, { params }) {
                   amountPaid: DEPOSIT_AMOUNT,
                   paymentMethod: 'stripe',
                   stripeSessionId: sessionId,
+                  stripePaymentMethodId: paymentMethodId,
+                  status: 'confirmed', // Auto-confirm when paid
                   updatedAt: new Date() 
                 } 
               }
@@ -687,6 +719,107 @@ export async function POST(request, { params }) {
       // For webhooks, we need raw body - but in this simplified version, 
       // we rely on polling for status updates
       return NextResponse.json({ received: true }, { headers: corsHeaders() });
+    }
+    
+    // Charge remaining balance using saved card
+    if (path === '/payments/charge-balance') {
+      const { bookingId, amount } = body;
+      
+      if (!bookingId || !amount) {
+        return NextResponse.json({ error: 'Booking ID and amount required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      // Get booking
+      const booking = await db.collection('bookings').findOne({ id: bookingId });
+      if (!booking) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404, headers: corsHeaders() });
+      }
+      
+      // Check if we have saved payment method
+      if (!booking.stripeCustomerId || !booking.stripePaymentMethodId) {
+        return NextResponse.json({ 
+          error: 'No saved payment method. Customer needs to pay manually.',
+          noSavedCard: true 
+        }, { status: 400, headers: corsHeaders() });
+      }
+      
+      try {
+        // Create payment intent to charge the saved card
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100), // Convert to cents
+          currency: 'usd',
+          customer: booking.stripeCustomerId,
+          payment_method: booking.stripePaymentMethodId,
+          off_session: true,
+          confirm: true,
+          description: `Remaining balance for booking ${bookingId}`,
+          metadata: {
+            bookingId: bookingId,
+            type: 'balance_payment',
+          },
+        });
+        
+        if (paymentIntent.status === 'succeeded') {
+          // Update booking
+          const newAmountPaid = (booking.amountPaid || 0) + amount;
+          const totalPrice = booking.finalPrice || booking.estimatedPrice;
+          const isFullyPaid = newAmountPaid >= totalPrice;
+          
+          await db.collection('bookings').updateOne(
+            { id: bookingId },
+            { 
+              $set: { 
+                amountPaid: newAmountPaid,
+                paymentStatus: isFullyPaid ? 'paid' : 'deposit_paid',
+                balanceChargedAt: new Date(),
+                updatedAt: new Date() 
+              } 
+            }
+          );
+          
+          // Record transaction
+          await db.collection('payment_transactions').insertOne({
+            id: uuidv4(),
+            bookingId: bookingId,
+            amount: amount,
+            currency: 'usd',
+            status: 'complete',
+            paymentStatus: 'completed',
+            type: 'balance_payment',
+            stripePaymentIntentId: paymentIntent.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          
+          return NextResponse.json({ 
+            success: true,
+            message: `Successfully charged $${amount}`,
+            amountCharged: amount,
+            totalPaid: newAmountPaid,
+            isFullyPaid: isFullyPaid,
+          }, { headers: corsHeaders() });
+        } else {
+          return NextResponse.json({ 
+            error: 'Payment not completed',
+            status: paymentIntent.status 
+          }, { status: 400, headers: corsHeaders() });
+        }
+        
+      } catch (stripeError) {
+        console.error('Stripe Charge Error:', stripeError);
+        
+        // Handle specific errors
+        if (stripeError.code === 'card_declined') {
+          return NextResponse.json({ 
+            error: 'Card was declined. Please contact customer for alternative payment.',
+            code: 'card_declined'
+          }, { status: 400, headers: corsHeaders() });
+        }
+        
+        return NextResponse.json({ 
+          error: stripeError.message || 'Failed to charge card'
+        }, { status: 500, headers: corsHeaders() });
+      }
     }
     
     // Update email settings

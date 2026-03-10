@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Truck, ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, DollarSign, Save, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Truck, ArrowLeft, Phone, Mail, MapPin, Calendar, Clock, DollarSign, Save, Loader2, Plus, Trash2, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function JobDetailPage() {
@@ -18,6 +18,7 @@ export default function JobDetailPage() {
   const params = useParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [chargingBalance, setChargingBalance] = useState(false);
   const [job, setJob] = useState(null);
   const [extraCharge, setExtraCharge] = useState({ type: '', amount: '', note: '' });
 
@@ -86,6 +87,52 @@ export default function JobDetailPage() {
   const removeExtraCharge = (index) => {
     const newCharges = job.extraCharges.filter((_, i) => i !== index);
     setJob(prev => ({ ...prev, extraCharges: newCharges }));
+  };
+
+  const chargeRemainingBalance = async () => {
+    const totalPrice = job.finalPrice || calculateTotal();
+    const amountPaid = job.amountPaid || 0;
+    const remainingBalance = totalPrice - amountPaid;
+    
+    if (remainingBalance <= 0) {
+      toast.error('No remaining balance to charge');
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to charge $${remainingBalance.toFixed(2)} to the customer's saved card?`)) {
+      return;
+    }
+    
+    setChargingBalance(true);
+    try {
+      const response = await fetch('/api/payments/charge-balance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: job.id,
+          amount: remainingBalance
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(`Successfully charged $${remainingBalance.toFixed(2)}`);
+        // Refresh job data
+        fetchJob();
+      } else if (data.noSavedCard) {
+        toast.error('No saved card on file. Customer needs to pay manually.');
+      } else if (data.code === 'card_declined') {
+        toast.error('Card was declined. Contact customer for alternative payment.');
+      } else {
+        toast.error(data.error || 'Failed to charge card');
+      }
+    } catch (error) {
+      console.error('Error charging balance:', error);
+      toast.error('Failed to charge balance');
+    } finally {
+      setChargingBalance(false);
+    }
   };
 
   const calculateTotal = () => {
@@ -432,6 +479,38 @@ export default function JobDetailPage() {
                 <span className="text-gray-900">${(job.finalPrice || calculateTotal()) - (job.amountPaid || 0)}</span>
               </div>
             </div>
+            
+            {/* Charge Balance Button */}
+            {((job.finalPrice || calculateTotal()) - (job.amountPaid || 0)) > 0 && job.stripePaymentMethodId && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-blue-900">💳 Saved Card on File</p>
+                    <p className="text-sm text-blue-700">Charge the remaining balance to customer's card</p>
+                  </div>
+                  <Button 
+                    onClick={chargeRemainingBalance}
+                    disabled={chargingBalance}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {chargingBalance ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Charging...</>
+                    ) : (
+                      <><CreditCard className="h-4 w-4 mr-2" /> Charge ${((job.finalPrice || calculateTotal()) - (job.amountPaid || 0)).toFixed(2)}</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {/* No Saved Card Notice */}
+            {((job.finalPrice || calculateTotal()) - (job.amountPaid || 0)) > 0 && !job.stripePaymentMethodId && job.paymentStatus !== 'unpaid' && (
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ No saved card on file. Collect remaining balance manually (cash, Venmo, etc.)
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
