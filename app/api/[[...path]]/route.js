@@ -975,7 +975,7 @@ export async function POST(request, { params }) {
         return NextResponse.json({ error: 'Email address required' }, { status: 400, headers: corsHeaders() });
       }
       
-      // Create a dummy booking for the test
+      // Create a dummy booking for the test - mark as paid/confirmed
       const testBooking = {
         id: 'test-booking',
         customerName: 'Test Customer',
@@ -987,6 +987,11 @@ export async function POST(request, { params }) {
         rentalDuration: 2,
         loadType: 'household',
         estimatedPrice: 214,
+        finalPrice: 214,
+        paymentStatus: 'deposit_paid', // Mark as paid so confirmation shows "CONFIRMED"
+        depositPaid: true,
+        depositAmount: 50,
+        status: 'confirmed'
       };
       
       let result;
@@ -996,6 +1001,15 @@ export async function POST(request, { params }) {
           break;
         case 'followup':
           result = await sendJobCompletedEmail(testBooking);
+          break;
+        case 'dropped_off':
+          result = await sendTrailerDroppedOffEmail(testBooking);
+          break;
+        case 'picked_up':
+          result = await sendTrailerPickedUpEmail(testBooking);
+          break;
+        case 'completed':
+          result = await sendJobCompletedNotification(testBooking);
           break;
         case 'confirmation':
         default:
