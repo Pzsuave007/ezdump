@@ -432,6 +432,9 @@ export default function EmailAutomationPage() {
                         <SelectContent className="bg-gray-800 border-gray-700">
                           <SelectItem value="confirmation">Booking Confirmation</SelectItem>
                           <SelectItem value="reminder">Day-of Reminder</SelectItem>
+                          <SelectItem value="dropped_off">🚛 Trailer Dropped Off</SelectItem>
+                          <SelectItem value="picked_up">✅ Trailer Picked Up</SelectItem>
+                          <SelectItem value="completed">🎉 Job Completed (with discount code)</SelectItem>
                           <SelectItem value="followup">Follow-up / Review Request</SelectItem>
                         </SelectContent>
                       </Select>
