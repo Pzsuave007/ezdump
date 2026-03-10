@@ -70,8 +70,48 @@ export default function JobDetailPage() {
     }
   };
 
-  const handleChange = (field, value) => {
+  const handleChange = async (field, value) => {
+    const previousValue = job[field];
     setJob(prev => ({ ...prev, [field]: value }));
+    
+    // Send notification email when status changes to certain values
+    if (field === 'status' && previousValue !== value) {
+      let emailType = null;
+      let statusName = '';
+      
+      if (value === 'dropped_off') {
+        emailType = 'dropped_off';
+        statusName = 'Dropped Off';
+      } else if (value === 'picked_up') {
+        emailType = 'picked_up';
+        statusName = 'Picked Up';
+      } else if (value === 'completed') {
+        emailType = 'completed';
+        statusName = 'Completed';
+      }
+      
+      if (emailType) {
+        // Ask user if they want to send notification
+        if (confirm(`Send "${statusName}" notification email to ${job.email}?`)) {
+          try {
+            const response = await fetch('/api/email/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bookingId: job.id, type: emailType })
+            });
+            const result = await response.json();
+            if (result.success) {
+              toast.success(`${statusName} notification sent to ${job.email}`);
+            } else {
+              toast.error(`Failed to send email: ${result.error}`);
+            }
+          } catch (error) {
+            console.error('Error sending status email:', error);
+            toast.error('Failed to send notification email');
+          }
+        }
+      }
+    }
   };
 
   const addExtraCharge = () => {

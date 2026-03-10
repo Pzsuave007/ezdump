@@ -7,6 +7,9 @@ import {
   sendBookingConfirmation, 
   sendDayOfReminder, 
   sendJobCompletedEmail,
+  sendTrailerDroppedOffEmail,
+  sendTrailerPickedUpEmail,
+  sendJobCompletedNotification,
   testEmailConnection,
   isEmailConfigured 
 } from '@/lib/email';
@@ -918,6 +921,15 @@ export async function POST(request, { params }) {
           break;
         case 'followup':
           result = await sendJobCompletedEmail(booking);
+          break;
+        case 'dropped_off':
+          result = await sendTrailerDroppedOffEmail(booking);
+          break;
+        case 'picked_up':
+          result = await sendTrailerPickedUpEmail(booking);
+          break;
+        case 'completed':
+          result = await sendJobCompletedNotification(booking);
           break;
         case 'confirmation':
         default:
