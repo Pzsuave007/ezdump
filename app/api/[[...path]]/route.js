@@ -12,7 +12,7 @@ import {
 } from '@/lib/email';
 
 // Initialize Stripe with Secret Key (for server-side operations)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY || 'sk_test_placeholder', {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY || 'placeholder', {
   apiVersion: '2024-12-18.acacia',
 });
 
@@ -540,7 +540,7 @@ export async function POST(request, { params }) {
       
       // Check if Stripe is properly configured
       const stripeKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_API_KEY;
-      if (!stripeKey || stripeKey === 'sk_test_placeholder' || stripeKey.length < 20) {
+      if (!stripeKey || stripeKey === 'placeholder' || stripeKey.length < 20) {
         // Return a demo response for testing - indicates Stripe is ready but needs real key
         return NextResponse.json({ 
           demo: true,
