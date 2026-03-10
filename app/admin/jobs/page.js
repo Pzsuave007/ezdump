@@ -162,9 +162,19 @@ export default function JobsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-lg">{job.customerName}</h3>
+                          {(job.paymentStatus === 'deposit_paid' || job.paymentStatus === 'paid') && (
+                            <Badge className="bg-green-500 text-white">
+                              ✓ Confirmed
+                            </Badge>
+                          )}
                           <Badge className={statusColors[job.status]}>
                             {job.status.replace('_', ' ')}
                           </Badge>
+                          {job.paymentStatus === 'unpaid' && (
+                            <Badge className="bg-yellow-100 text-yellow-800">
+                              Unpaid
+                            </Badge>
+                          )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600">
                           <div className="flex items-center">
@@ -190,6 +200,9 @@ export default function JobsPage() {
                         <div className="text-right">
                           <p className="text-sm text-gray-500">{loadTypeLabels[job.loadType] || job.loadType}</p>
                           <p className="text-lg font-bold text-gray-900">${job.finalPrice || job.estimatedPrice}</p>
+                          {(job.paymentStatus === 'deposit_paid' || job.paymentStatus === 'paid') && (
+                            <p className="text-xs text-green-600">Deposit: ${job.depositAmount || 50}</p>
+                          )}
                         </div>
                         <ChevronRight className="h-5 w-5 text-gray-400" />
                       </div>

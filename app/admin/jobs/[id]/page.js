@@ -152,12 +152,30 @@ export default function JobDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Job Status</span>
-              <Badge className={`${statusColors[job.status]} text-sm px-3 py-1`}>
-                {job.status.replace('_', ' ').toUpperCase()}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {(job.paymentStatus === 'deposit_paid' || job.paymentStatus === 'paid') && (
+                  <Badge className="bg-green-500 text-white text-sm px-3 py-1">
+                    ✓ CONFIRMED
+                  </Badge>
+                )}
+                <Badge className={`${statusColors[job.status]} text-sm px-3 py-1`}>
+                  {job.status.replace('_', ' ').toUpperCase()}
+                </Badge>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Payment Confirmation Banner */}
+            {(job.paymentStatus === 'deposit_paid' || job.paymentStatus === 'paid') && (
+              <div className="mb-4 p-3 bg-green-100 border border-green-400 rounded-lg text-green-800 text-center">
+                <strong>✅ Booking Confirmed</strong> - Deposit of ${job.depositAmount || 50} received via {job.paymentMethod || 'Stripe'}
+              </div>
+            )}
+            {job.paymentStatus === 'unpaid' && (
+              <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg text-yellow-800 text-center">
+                <strong>⏳ Pending Confirmation</strong> - Waiting for deposit payment
+              </div>
+            )}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {['pending', 'confirmed', 'dropped_off', 'in_progress', 'picked_up', 'dumped', 'completed', 'cancelled'].map((status) => (
                 <Button
