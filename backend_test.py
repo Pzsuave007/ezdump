@@ -10,7 +10,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Base configuration
-BASE_URL = "https://ez-load-booking.preview.emergentagent.com"
+BASE_URL = "https://easy-book-haul.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test data - realistic dump trailer rental data
@@ -437,6 +437,152 @@ def test_invalid_booking_creation():
         log_test("POST /api/bookings (invalid)", "FAIL", f"Exception: {str(e)}")
         return False
 
+def test_email_preview_endpoint():
+    """Test GET /api/email/preview - Email template preview endpoint"""
+    try:
+        # Define expected subjects for each template type
+        expected_subjects = {
+            "confirmation_paid": "Booking CONFIRMED",
+            "confirmation_unpaid": "Booking Received", 
+            "reminder": "Reminder: Your Dump Trailer",
+            "dropped_off": "Trailer Has Been Delivered",
+            "picked_up": "Trailer Picked Up",
+            "completed": "Job Complete - Thank You",
+            "followup": "Thanks for using Easy Load"
+        }
+        
+        # Test each template type
+        all_passed = True
+        test_results = []
+        
+        for template_type, expected_subject in expected_subjects.items():
+            try:
+                response = requests.get(f"{API_BASE}/email/preview?type={template_type}", timeout=10)
+                
+                if response.status_code != 200:
+                    log_test(f"Email Preview ({template_type})", "FAIL", f"Status: {response.status_code}")
+                    all_passed = False
+                    test_results.append((template_type, False, f"HTTP {response.status_code}"))
+                    continue
+                
+                data = response.json()
+                
+                # Check required response fields
+                required_fields = ['html', 'subject', 'templateName', 'type']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if missing_fields:
+                    log_test(f"Email Preview ({template_type})", "FAIL", f"Missing fields: {missing_fields}")
+                    all_passed = False
+                    test_results.append((template_type, False, f"Missing: {missing_fields}"))
+                    continue
+                
+                # Check if subject contains expected text
+                actual_subject = data['subject']
+                if expected_subject not in actual_subject:
+                    log_test(f"Email Preview ({template_type})", "FAIL", 
+                           f"Subject mismatch. Expected: '{expected_subject}', Got: '{actual_subject}'")
+                    all_passed = False
+                    test_results.append((template_type, False, f"Wrong subject: {actual_subject}"))
+                    continue
+                
+                # Check HTML content is not empty and contains expected elements
+                html_content = data['html']
+                if not html_content or len(html_content.strip()) == 0:
+                    log_test(f"Email Preview ({template_type})", "FAIL", "Empty HTML content")
+                    all_passed = False
+                    test_results.append((template_type, False, "Empty HTML"))
+                    continue
+                
+                # Check HTML contains "Easy Load & Dump"
+                if "Easy Load & Dump" not in html_content:
+                    log_test(f"Email Preview ({template_type})", "FAIL", "HTML missing 'Easy Load & Dump'")
+                    all_passed = False
+                    test_results.append((template_type, False, "Missing company name"))
+                    continue
+                
+                # Special check for completed template - should contain REPEAT10 discount code
+                if template_type == "completed" and "REPEAT10" not in html_content:
+                    log_test(f"Email Preview ({template_type})", "FAIL", "Completed template missing REPEAT10 code")
+                    all_passed = False
+                    test_results.append((template_type, False, "Missing REPEAT10 code"))
+                    continue
+                
+                # Check type matches request
+                if data['type'] != template_type:
+                    log_test(f"Email Preview ({template_type})", "FAIL", f"Type mismatch: {data['type']}")
+                    all_passed = False
+                    test_results.append((template_type, False, f"Wrong type: {data['type']}"))
+                    continue
+                
+                log_test(f"Email Preview ({template_type})", "PASS", 
+                        f"Subject: '{actual_subject}', Template: {data['templateName']}")
+                test_results.append((template_type, True, f"Subject: {actual_subject}"))
+                
+            except Exception as e:
+                log_test(f"Email Preview ({template_type})", "FAIL", f"Exception: {str(e)}")
+                all_passed = False
+                test_results.append((template_type, False, f"Exception: {str(e)}"))
+        
+        # Test default type (no query param)
+        try:
+            response = requests.get(f"{API_BASE}/email/preview", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if 'html' in data and 'subject' in data and data['subject']:
+                    log_test("Email Preview (default)", "PASS", f"Default template: {data.get('templateName', 'N/A')}")
+                    test_results.append(("default", True, f"Default: {data.get('templateName')}"))
+                else:
+                    log_test("Email Preview (default)", "FAIL", "Invalid default response")
+                    all_passed = False
+                    test_results.append(("default", False, "Invalid response"))
+            else:
+                log_test("Email Preview (default)", "FAIL", f"Status: {response.status_code}")
+                all_passed = False
+                test_results.append(("default", False, f"HTTP {response.status_code}"))
+        except Exception as e:
+            log_test("Email Preview (default)", "FAIL", f"Exception: {str(e)}")
+            all_passed = False
+            test_results.append(("default", False, f"Exception: {str(e)}"))
+        
+        # Test invalid type (should return fallback)
+        try:
+            response = requests.get(f"{API_BASE}/email/preview?type=invalid_type", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if 'html' in data and 'subject' in data and data['subject']:
+                    log_test("Email Preview (invalid type)", "PASS", "Fallback template returned")
+                    test_results.append(("invalid", True, "Fallback works"))
+                else:
+                    log_test("Email Preview (invalid type)", "FAIL", "No fallback response")
+                    all_passed = False
+                    test_results.append(("invalid", False, "No fallback"))
+            else:
+                log_test("Email Preview (invalid type)", "FAIL", f"Status: {response.status_code}")
+                all_passed = False
+                test_results.append(("invalid", False, f"HTTP {response.status_code}"))
+        except Exception as e:
+            log_test("Email Preview (invalid type)", "FAIL", f"Exception: {str(e)}")
+            all_passed = False
+            test_results.append(("invalid", False, f"Exception: {str(e)}"))
+        
+        # Summary for email preview tests
+        passed_count = sum(1 for _, passed, _ in test_results if passed)
+        total_count = len(test_results)
+        
+        if all_passed and passed_count == total_count:
+            log_test("GET /api/email/preview (Overall)", "PASS", 
+                   f"All {total_count} email template tests passed")
+            return True
+        else:
+            log_test("GET /api/email/preview (Overall)", "FAIL", 
+                   f"Only {passed_count}/{total_count} email template tests passed")
+            return False
+            
+    except Exception as e:
+        log_test("GET /api/email/preview", "FAIL", f"Exception: {str(e)}")
+        return False
+
 def run_all_tests():
     """Run all backend API tests"""
     print("🔥 Starting Backend API Tests for Easy Load & Dump")
@@ -462,6 +608,9 @@ def run_all_tests():
     test_results.append(("Update Pricing", test_update_pricing()))
     test_results.append(("Dashboard Stats", test_get_stats()))
     test_results.append(("Calendar Data", test_get_calendar()))
+    
+    print("\n📧 EMAIL FUNCTIONALITY TESTS:")
+    test_results.append(("Email Preview API", test_email_preview_endpoint()))
     
     print("\n🛡️ VALIDATION TESTS:")
     test_results.append(("Invalid Booking", test_invalid_booking_creation()))

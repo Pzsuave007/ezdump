@@ -285,20 +285,39 @@ backend:
         agent: "testing"
         comment: "✅ PASSED: Returns calendar bookings array. Supports month/year filtering (?month=3&year=2025). Found 2 bookings total, 2 this month."
 
+  - task: "GET /api/email/preview - Email template preview endpoint"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented email preview endpoint that returns HTML, subject, and templateName for 7 email template types: confirmation_paid, confirmation_unpaid, reminder, dropped_off, picked_up, completed, followup. Uses sample booking data. No emails are sent."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED: Comprehensive email preview API testing completed successfully! Tested all 7 template types with correct subjects: confirmation_paid ('Booking CONFIRMED'), confirmation_unpaid ('Booking Received'), reminder ('Reminder: Your Dump Trailer'), dropped_off ('Trailer Has Been Delivered'), picked_up ('Trailer Picked Up'), completed ('Job Complete - Thank You' + REPEAT10 code), followup ('Thanks for using Easy Load'). All response formats correct with html, subject, templateName, type fields. Default type and invalid type fallback working. HTML content contains 'Easy Load & Dump' company name. All requirements from review request satisfied."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus: []
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
     message: "Initial MVP implementation complete. All backend APIs implemented for dump trailer rental business. Testing all endpoints. Default admin credentials: admin/admin123"
   - agent: "testing"
     message: "🎉 COMPREHENSIVE BACKEND TESTING COMPLETED - ALL TESTS PASSED! Tested 13 API endpoints with realistic dump trailer rental data. All core functionality working: pricing, bookings (create/read/update), admin auth, customer management, stats, and calendar. Created test booking for Sarah Johnson ($345, 4hr rental). Authentication working (admin/admin123). Data persistence verified across MongoDB collections. No critical issues found. Backend is production-ready."
+  - agent: "main"
+    message: "Added new email preview feature. New endpoint: GET /api/email/preview?type=<type>. Supported types: confirmation_paid, confirmation_unpaid, reminder, dropped_off, picked_up, completed, followup. Returns JSON with {html, subject, templateName, type}. Please test this new endpoint with all 7 types. Also test that the default type (no param) returns a valid response."
+  - agent: "testing"
+    message: "✅ EMAIL PREVIEW API TESTING COMPLETE - ALL REQUIREMENTS SATISFIED! Thoroughly tested GET /api/email/preview endpoint with all 7 template types. All subject lines match requirements: confirmation_paid ('Booking CONFIRMED'), confirmation_unpaid ('Booking Received'), reminder ('Reminder: Your Dump Trailer'), dropped_off ('Trailer Has Been Delivered'), picked_up ('Trailer Picked Up'), completed ('Job Complete - Thank You'), followup ('Thanks for using Easy Load'). Response format correct with html/subject/templateName/type fields. HTML contains 'Easy Load & Dump' company branding. REPEAT10 discount code confirmed in completed template. Default type and invalid type fallback working properly. 14/14 backend tests passed including new email preview functionality."

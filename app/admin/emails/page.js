@@ -27,7 +27,8 @@ import {
   LogOut,
   RefreshCw,
   TestTube,
-  History
+  History,
+  Eye
 } from 'lucide-react';
 
 export default function EmailAutomationPage() {
@@ -41,6 +42,11 @@ export default function EmailAutomationPage() {
   const [testEmail, setTestEmail] = useState('');
   const [testType, setTestType] = useState('confirmation');
   const [message, setMessage] = useState(null);
+  const [previewType, setPreviewType] = useState('');
+  const [previewHtml, setPreviewHtml] = useState('');
+  const [previewSubject, setPreviewSubject] = useState('');
+  const [previewName, setPreviewName] = useState('');
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   useEffect(() => {
     // Check auth
@@ -131,6 +137,27 @@ export default function EmailAutomationPage() {
       setMessage({ type: 'error', text: error.message });
     } finally {
       setTesting(false);
+    }
+  };
+
+  const loadPreview = async (type) => {
+    setLoadingPreview(true);
+    setPreviewType(type);
+    try {
+      const response = await fetch(`/api/email/preview?type=${type}`);
+      const data = await response.json();
+      if (data.html) {
+        setPreviewHtml(data.html);
+        setPreviewSubject(data.subject || '');
+        setPreviewName(data.templateName || '');
+      }
+    } catch (error) {
+      console.error('Error loading preview:', error);
+      setPreviewHtml('');
+      setPreviewSubject('');
+      setPreviewName('');
+    } finally {
+      setLoadingPreview(false);
     }
   };
 
@@ -262,6 +289,9 @@ export default function EmailAutomationPage() {
             <TabsList className="bg-gray-900 border border-gray-800">
               <TabsTrigger value="settings" className="data-[state=active]:bg-gray-800">
                 <Settings className="h-4 w-4 mr-2" /> Automation Settings
+              </TabsTrigger>
+              <TabsTrigger value="preview" className="data-[state=active]:bg-gray-800">
+                <Eye className="h-4 w-4 mr-2" /> Preview Templates
               </TabsTrigger>
               <TabsTrigger value="test" className="data-[state=active]:bg-gray-800">
                 <TestTube className="h-4 w-4 mr-2" /> Test Emails
@@ -400,6 +430,82 @@ export default function EmailAutomationPage() {
                   </Button>
                 </div>
               </div>
+            </TabsContent>
+
+            {/* Preview Tab */}
+            <TabsContent value="preview">
+              <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-white">Email Template Preview</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Preview how your email templates look with sample data — no emails are sent
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'confirmation_paid', label: '✅ Booking Confirmed (Paid)' },
+                      { value: 'confirmation_unpaid', label: '📋 Booking Received (Unpaid)' },
+                      { value: 'reminder', label: '📅 Day-of Reminder' },
+                      { value: 'dropped_off', label: '🚛 Trailer Dropped Off' },
+                      { value: 'picked_up', label: '✅ Trailer Picked Up' },
+                      { value: 'completed', label: '🎉 Job Completed' },
+                      { value: 'followup', label: '⭐ Follow-up / Review' },
+                    ].map((tmpl) => (
+                      <Button
+                        key={tmpl.value}
+                        variant={previewType === tmpl.value ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => loadPreview(tmpl.value)}
+                        className={previewType === tmpl.value 
+                          ? 'bg-white text-black hover:bg-gray-200' 
+                          : 'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'}
+                      >
+                        {tmpl.label}
+                      </Button>
+                    ))}
+                  </div>
+
+                  {loadingPreview && (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      <span className="ml-3 text-gray-400">Loading preview...</span>
+                    </div>
+                  )}
+
+                  {!loadingPreview && !previewHtml && (
+                    <div className="text-center py-16 border border-dashed border-gray-700 rounded-lg">
+                      <Eye className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-500 text-lg">Select a template above to preview it</p>
+                      <p className="text-gray-600 text-sm mt-1">Uses sample data — no actual emails are sent</p>
+                    </div>
+                  )}
+
+                  {!loadingPreview && previewHtml && (
+                    <div className="space-y-3">
+                      <div className="bg-gray-800 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge className="bg-blue-600">{previewName}</Badge>
+                        </div>
+                        <p className="text-gray-400 text-xs mb-1">Subject Line:</p>
+                        <p className="text-white font-medium text-sm">{previewSubject}</p>
+                      </div>
+                      <div className="bg-white rounded-lg overflow-hidden" style={{ minHeight: '600px' }}>
+                        <iframe
+                          srcDoc={previewHtml}
+                          title="Email Preview"
+                          className="w-full border-0"
+                          style={{ minHeight: '700px', height: '100%' }}
+                          sandbox="allow-same-origin"
+                        />
+                      </div>
+                      <p className="text-gray-600 text-xs text-center">
+                        This is a preview with sample data. Actual emails will contain real booking details.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
 
             {/* Test Tab */}

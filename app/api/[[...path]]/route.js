@@ -11,7 +11,8 @@ import {
   sendTrailerPickedUpEmail,
   sendJobCompletedNotification,
   testEmailConnection,
-  isEmailConfigured 
+  isEmailConfigured,
+  emailTemplates 
 } from '@/lib/email';
 
 // Initialize Stripe with Secret Key (for server-side operations)
@@ -416,6 +417,76 @@ export async function GET(request, { params }) {
     if (path === '/email/test') {
       const result = await testEmailConnection();
       return NextResponse.json(result, { headers: corsHeaders() });
+    }
+    
+    // Email template preview
+    if (path === '/email/preview') {
+      const url = new URL(request.url);
+      const type = url.searchParams.get('type') || 'confirmation';
+      
+      // Sample booking data for preview
+      const sampleBooking = {
+        customerName: 'John Smith',
+        email: 'john@example.com',
+        phone: '(509) 555-1234',
+        address: '1234 Main St, Spokane, WA 99201',
+        preferredDate: new Date().toISOString().split('T')[0],
+        preferredTime: '9:00 AM',
+        rentalDuration: 4,
+        loadType: 'Household Junk / Furniture',
+        estimatedPrice: 225,
+        finalPrice: 225,
+        depositPaid: true,
+        paymentStatus: 'paid',
+        discountCode: '',
+        discountAmount: 0,
+        status: 'completed',
+        createdAt: new Date().toISOString(),
+      };
+      
+      let template;
+      let templateName;
+      
+      switch (type) {
+        case 'confirmation_paid':
+          template = emailTemplates.bookingConfirmation({ ...sampleBooking, paymentStatus: 'paid', depositPaid: true });
+          templateName = 'Booking Confirmation (Paid)';
+          break;
+        case 'confirmation_unpaid':
+          template = emailTemplates.bookingConfirmation({ ...sampleBooking, paymentStatus: 'pending', depositPaid: false });
+          templateName = 'Booking Confirmation (Unpaid)';
+          break;
+        case 'reminder':
+          template = emailTemplates.dayOfReminder(sampleBooking);
+          templateName = 'Day-of Reminder';
+          break;
+        case 'dropped_off':
+          template = emailTemplates.trailerDroppedOff(sampleBooking);
+          templateName = 'Trailer Dropped Off';
+          break;
+        case 'picked_up':
+          template = emailTemplates.trailerPickedUp(sampleBooking);
+          templateName = 'Trailer Picked Up';
+          break;
+        case 'completed':
+          template = emailTemplates.jobCompletedNotification(sampleBooking);
+          templateName = 'Job Completed (with REPEAT10 code)';
+          break;
+        case 'followup':
+          template = emailTemplates.jobCompleted(sampleBooking);
+          templateName = 'Follow-up / Review Request';
+          break;
+        default:
+          template = emailTemplates.bookingConfirmation(sampleBooking);
+          templateName = 'Booking Confirmation (Paid)';
+      }
+      
+      return NextResponse.json({
+        html: template.html,
+        subject: template.subject,
+        templateName,
+        type
+      }, { headers: corsHeaders() });
     }
     
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders() });
