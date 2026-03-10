@@ -184,6 +184,74 @@ export async function GET(request, { params }) {
       }, { headers: corsHeaders() });
     }
     
+    // ============================================
+    // DISCOUNT CODES
+    // ============================================
+    
+    // Get all discount codes
+    if (path === '/discount-codes') {
+      const codes = await db.collection('discount_codes').find({}).sort({ createdAt: -1 }).toArray();
+      return NextResponse.json(codes, { headers: corsHeaders() });
+    }
+    
+    // Validate a discount code (public endpoint for booking form)
+    if (path === '/discount-codes/validate') {
+      const code = searchParams.get('code');
+      const orderAmount = parseFloat(searchParams.get('amount')) || 0;
+      
+      if (!code) {
+        return NextResponse.json({ valid: false, error: 'Code required' }, { headers: corsHeaders() });
+      }
+      
+      const discountCode = await db.collection('discount_codes').findOne({ 
+        code: code.toUpperCase(),
+        isActive: true
+      });
+      
+      if (!discountCode) {
+        return NextResponse.json({ valid: false, error: 'Invalid discount code' }, { headers: corsHeaders() });
+      }
+      
+      // Check if expired
+      if (discountCode.expiresAt && new Date(discountCode.expiresAt) < new Date()) {
+        return NextResponse.json({ valid: false, error: 'This code has expired' }, { headers: corsHeaders() });
+      }
+      
+      // Check max uses
+      if (discountCode.maxUses > 0 && (discountCode.usedCount || 0) >= discountCode.maxUses) {
+        return NextResponse.json({ valid: false, error: 'This code has reached its usage limit' }, { headers: corsHeaders() });
+      }
+      
+      // Check minimum order amount
+      if (discountCode.minOrderAmount > 0 && orderAmount < discountCode.minOrderAmount) {
+        return NextResponse.json({ 
+          valid: false, 
+          error: `Minimum order of $${discountCode.minOrderAmount} required for this code` 
+        }, { headers: corsHeaders() });
+      }
+      
+      // Calculate discount
+      let discountAmount = 0;
+      if (discountCode.type === 'percentage') {
+        discountAmount = (orderAmount * discountCode.value) / 100;
+      } else {
+        discountAmount = discountCode.value;
+      }
+      
+      // Cap discount at order amount
+      discountAmount = Math.min(discountAmount, orderAmount);
+      
+      return NextResponse.json({
+        valid: true,
+        code: discountCode.code,
+        type: discountCode.type,
+        value: discountCode.value,
+        description: discountCode.description,
+        discountAmount: Math.round(discountAmount * 100) / 100,
+        finalAmount: Math.round((orderAmount - discountAmount) * 100) / 100
+      }, { headers: corsHeaders() });
+    }
+    
     // Calendar data
     if (path === '/calendar') {
       const month = searchParams.get('month');
@@ -390,6 +458,42 @@ export async function POST(request, { params }) {
       }, { headers: corsHeaders() });
     }
     
+    // ============================================
+    // DISCOUNT CODES - CREATE
+    // ============================================
+    if (path === '/discount-codes') {
+      const { code, type, value, description, maxUses, minOrderAmount, expiresAt, isActive } = body;
+      
+      if (!code || !value) {
+        return NextResponse.json({ error: 'Code and value required' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      // Check if code already exists
+      const existingCode = await db.collection('discount_codes').findOne({ code: code.toUpperCase() });
+      if (existingCode) {
+        return NextResponse.json({ error: 'This code already exists' }, { status: 400, headers: corsHeaders() });
+      }
+      
+      const newCode = {
+        id: uuidv4(),
+        code: code.toUpperCase(),
+        type: type || 'percentage',
+        value: parseFloat(value),
+        description: description || '',
+        maxUses: parseInt(maxUses) || 0,
+        minOrderAmount: parseFloat(minOrderAmount) || 0,
+        expiresAt: expiresAt || null,
+        isActive: isActive !== false,
+        usedCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await db.collection('discount_codes').insertOne(newCode);
+      
+      return NextResponse.json(newCode, { headers: corsHeaders() });
+    }
+    
     // Create booking (public)
     if (path === '/bookings') {
       const {
@@ -407,7 +511,10 @@ export async function POST(request, { params }) {
         agreedToTerms,
         distanceTier,
         estimatedPrice: clientEstimatedPrice,
-        deliveryFee: clientDeliveryFee
+        finalPrice: clientFinalPrice,
+        deliveryFee: clientDeliveryFee,
+        discountCode,
+        discountAmount
       } = body;
       
       // Validate required fields
@@ -460,13 +567,15 @@ export async function POST(request, { params }) {
         loadType,
         description: description || '',
         promoCode: promoCode || '',
+        discountCode: discountCode || null,
+        discountAmount: discountAmount || 0,
         requestType: requestType || 'booking',
         agreedToTerms: agreedToTerms || false,
         distanceTier: distanceTier || 'standard',
         deliveryFee,
         status: 'pending',
         estimatedPrice,
-        finalPrice: null,
+        finalPrice: clientFinalPrice || estimatedPrice,
         extraCharges: [],
         internalNotes: '',
         paymentStatus: 'unpaid',
@@ -478,6 +587,14 @@ export async function POST(request, { params }) {
       };
       
       await db.collection('bookings').insertOne(booking);
+      
+      // Increment discount code usage if one was applied
+      if (discountCode) {
+        await db.collection('discount_codes').updateOne(
+          { code: discountCode },
+          { $inc: { usedCount: 1 } }
+        );
+      }
       
       // Check email automation settings and send confirmation email
       const emailSettings = await db.collection('email_settings').findOne({});
@@ -1068,6 +1185,27 @@ export async function PUT(request, { params }) {
       return NextResponse.json(updated, { headers: corsHeaders() });
     }
     
+    // Update discount code
+    if (path.startsWith('/discount-codes/') && pathSegments.length === 2) {
+      const codeId = pathSegments[1];
+      const updateData = { ...body, updatedAt: new Date() };
+      delete updateData.id;
+      delete updateData._id;
+      delete updateData.createdAt;
+      
+      const result = await db.collection('discount_codes').updateOne(
+        { id: codeId },
+        { $set: updateData }
+      );
+      
+      if (result.matchedCount === 0) {
+        return NextResponse.json({ error: 'Discount code not found' }, { status: 404, headers: corsHeaders() });
+      }
+      
+      const updated = await db.collection('discount_codes').findOne({ id: codeId });
+      return NextResponse.json(updated, { headers: corsHeaders() });
+    }
+    
     // Update customer
     if (path.startsWith('/customers/') && pathSegments.length === 2) {
       const customerId = pathSegments[1];
@@ -1126,6 +1264,18 @@ export async function DELETE(request, { params }) {
       
       if (result.deletedCount === 0) {
         return NextResponse.json({ error: 'Booking not found' }, { status: 404, headers: corsHeaders() });
+      }
+      
+      return NextResponse.json({ success: true }, { headers: corsHeaders() });
+    }
+    
+    // Delete discount code
+    if (path.startsWith('/discount-codes/') && pathSegments.length === 2) {
+      const codeId = pathSegments[1];
+      const result = await db.collection('discount_codes').deleteOne({ id: codeId });
+      
+      if (result.deletedCount === 0) {
+        return NextResponse.json({ error: 'Discount code not found' }, { status: 404, headers: corsHeaders() });
       }
       
       return NextResponse.json({ success: true }, { headers: corsHeaders() });

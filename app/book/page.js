@@ -55,6 +55,11 @@ function BookingPageContent() {
     agreedToTerms: false,
     distanceTier: urlDistance || 'standard'
   });
+  
+  // Discount code state
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountValidation, setDiscountValidation] = useState(null);
+  const [validatingDiscount, setValidatingDiscount] = useState(false);
 
   // Update form when URL params change
   useEffect(() => {
@@ -112,6 +117,42 @@ function BookingPageContent() {
     const deliveryFee = getDeliveryFee();
     return pricing.baseRentalFee + deliveryFee + pricing.dumpFee + (extraHours * pricing.extraHourFee);
   };
+  
+  // Calculate final price with discount
+  const calculateFinalPrice = () => {
+    const subtotal = calculateEstimate();
+    if (discountValidation?.valid && discountValidation?.discountAmount) {
+      return subtotal - discountValidation.discountAmount;
+    }
+    return subtotal;
+  };
+  
+  // Validate discount code
+  const validateDiscountCode = async () => {
+    if (!discountCode.trim()) {
+      setDiscountValidation(null);
+      return;
+    }
+    
+    setValidatingDiscount(true);
+    try {
+      const subtotal = calculateEstimate();
+      const response = await fetch(`/api/discount-codes/validate?code=${discountCode}&amount=${subtotal}`);
+      const data = await response.json();
+      setDiscountValidation(data);
+      
+      if (data.valid) {
+        toast.success(`Discount applied: ${data.type === 'percentage' ? data.value + '%' : '$' + data.value} off!`);
+      } else {
+        toast.error(data.error || 'Invalid discount code');
+      }
+    } catch (error) {
+      toast.error('Error validating code');
+      setDiscountValidation(null);
+    } finally {
+      setValidatingDiscount(false);
+    }
+  };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -142,11 +183,14 @@ function BookingPageContent() {
 
     setLoading(true);
     try {
-      // Include calculated estimate in the submission
+      // Include calculated estimate and discount in the submission
       const bookingData = {
         ...formData,
         estimatedPrice: calculateEstimate(),
+        finalPrice: calculateFinalPrice(),
         deliveryFee: getDeliveryFee(),
+        discountCode: discountValidation?.valid ? discountValidation.code : null,
+        discountAmount: discountValidation?.valid ? discountValidation.discountAmount : 0,
         status: 'pending_payment', // New status - waiting for payment
         paymentStatus: 'unpaid'
       };
@@ -501,14 +545,52 @@ function BookingPageContent() {
               />
             </div>
 
+            {/* Discount Code */}
             <div>
-              <Label htmlFor="promoCode">Promo Code (Optional)</Label>
-              <Input
-                id="promoCode"
-                value={formData.promoCode}
-                onChange={(e) => handleChange('promoCode', e.target.value)}
-                placeholder="Enter promo code"
-              />
+              <Label htmlFor="discountCode">Discount Code (Optional)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="discountCode"
+                  value={discountCode}
+                  onChange={(e) => {
+                    setDiscountCode(e.target.value.toUpperCase());
+                    setDiscountValidation(null);
+                  }}
+                  placeholder="Enter discount code"
+                  className="uppercase"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={validateDiscountCode}
+                  disabled={validatingDiscount || !discountCode.trim()}
+                >
+                  {validatingDiscount ? 'Checking...' : 'Apply'}
+                </Button>
+              </div>
+              
+              {/* Discount validation result */}
+              {discountValidation && (
+                <div className={`mt-2 p-3 rounded-lg ${discountValidation.valid ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  {discountValidation.valid ? (
+                    <div className="flex items-center text-green-700">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <span>
+                        <strong>{discountValidation.code}</strong> applied! 
+                        {discountValidation.type === 'percentage' 
+                          ? ` ${discountValidation.value}% off` 
+                          : ` $${discountValidation.value} off`}
+                        {' '}(-${discountValidation.discountAmount.toFixed(2)})
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center text-red-700">
+                      <XCircle className="h-4 w-4 mr-2" />
+                      <span>{discountValidation.error}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -655,9 +737,22 @@ function BookingPageContent() {
                     </div>
                   )}
                   <div className="border-t pt-3">
-                    <div className="flex justify-between font-bold text-lg">
+                    <div className="flex justify-between text-gray-700">
+                      <span>Subtotal</span>
+                      <span>${calculateEstimate()}</span>
+                    </div>
+                    
+                    {/* Discount display */}
+                    {discountValidation?.valid && (
+                      <div className="flex justify-between text-green-600 mt-1">
+                        <span>Discount ({discountValidation.code})</span>
+                        <span>-${discountValidation.discountAmount.toFixed(2)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between font-bold text-lg mt-2">
                       <span>Estimated Total</span>
-                      <span className="text-gray-900">${calculateEstimate()}</span>
+                      <span className="text-gray-900">${calculateFinalPrice()}</span>
                     </div>
                   </div>
                 </div>
