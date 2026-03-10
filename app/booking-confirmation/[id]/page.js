@@ -213,19 +213,36 @@ export default function BookingConfirmationPage() {
 
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-500" />
-            </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {booking.requestType === 'quote' ? 'Quote Request Received!' : 'Booking Request Received!'}
-            </h1>
-            <p className="text-gray-600 mb-8">
-              {booking.requestType === 'quote' 
-                ? "We've received your quote request. We'll get back to you shortly with a detailed estimate."
-                : "We've received your booking request. We'll confirm your appointment soon."
-              }
-            </p>
+            {isDepositPaid ? (
+              <>
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="h-10 w-10 text-green-500" />
+                </div>
+                
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Booking Confirmed! 🎉
+                </h1>
+                <p className="text-gray-600 mb-8">
+                  Your $50 deposit has been received. Your dump trailer is reserved for the date below!
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <AlertCircle className="h-10 w-10 text-yellow-500" />
+                </div>
+                
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {booking.requestType === 'quote' ? 'Quote Request Received!' : 'Complete Your Booking'}
+                </h1>
+                <p className="text-gray-600 mb-8">
+                  {booking.requestType === 'quote' 
+                    ? "We've received your quote request. We'll get back to you shortly with a detailed estimate."
+                    : "Your booking is saved but NOT confirmed yet. Please pay the $50 deposit to secure your spot."
+                  }
+                </p>
+              </>
+            )}
 
             <div className="bg-gray-50 rounded-lg p-6 text-left mb-6">
               <h2 className="font-semibold text-gray-900 mb-4">Booking Details</h2>
@@ -273,10 +290,10 @@ export default function BookingConfirmationPage() {
 
             {/* Payment Section */}
             {!isDepositPaid && booking.requestType !== 'quote' && (
-              <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 text-white mb-6">
+              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-lg p-6 text-white mb-6">
                 <div className="flex items-center justify-center mb-3">
                   <CreditCard className="h-6 w-6 mr-2" />
-                  <h3 className="text-lg font-semibold">Secure Your Booking</h3>
+                  <h3 className="text-lg font-semibold">⚠️ Payment Required to Confirm</h3>
                 </div>
                 
                 {paymentStatus === 'demo' ? (
@@ -292,8 +309,9 @@ export default function BookingConfirmationPage() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-gray-300 text-sm mb-4">
-                      Pay a ${DEPOSIT_AMOUNT} deposit now to confirm your spot. The balance (${booking.estimatedPrice - DEPOSIT_AMOUNT}) is due on the day of service.
+                    <p className="text-gray-200 text-sm mb-4">
+                      <strong>Your time slot is NOT reserved until payment is received.</strong><br/>
+                      Pay the ${DEPOSIT_AMOUNT} deposit now to confirm your booking. Balance (${booking.estimatedPrice - DEPOSIT_AMOUNT}) due on service day.
                     </p>
                     
                     {paymentError && (

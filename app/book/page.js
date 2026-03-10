@@ -146,9 +146,12 @@ function BookingPageContent() {
       const bookingData = {
         ...formData,
         estimatedPrice: calculateEstimate(),
-        deliveryFee: getDeliveryFee()
+        deliveryFee: getDeliveryFee(),
+        status: 'pending_payment', // New status - waiting for payment
+        paymentStatus: 'unpaid'
       };
       
+      // Create a pending booking first
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -161,9 +164,34 @@ function BookingPageContent() {
       }
 
       const booking = await response.json();
-      toast.success('Booking request submitted successfully!');
-      router.push(`/booking-confirmation/${booking.id}`);
+      
+      // Now redirect to Stripe payment
+      toast.loading('Redirecting to payment...');
+      
+      const paymentResponse = await fetch('/api/payments/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          origin: window.location.origin
+        })
+      });
+      
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.demo) {
+        // Stripe not configured - go to confirmation page
+        toast.dismiss();
+        toast.info('Payment system is being configured. Your booking has been saved.');
+        router.push(`/booking-confirmation/${booking.id}`);
+      } else if (paymentData.url) {
+        // Redirect to Stripe
+        window.location.href = paymentData.url;
+      } else {
+        throw new Error(paymentData.error || 'Failed to create payment session');
+      }
     } catch (error) {
+      toast.dismiss();
       toast.error(error.message);
     } finally {
       setLoading(false);
@@ -496,16 +524,22 @@ function BookingPageContent() {
             </label>
           </div>
 
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-yellow-800 text-center">
+              <strong>💳 $50 deposit required</strong> to confirm your booking
+            </p>
+          </div>
+
           <Button
             type="submit"
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
             size="lg"
             disabled={loading}
           >
             {loading ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
             ) : (
-              'Submit Booking Request'
+              '💳 Continue to Payment ($50 deposit)'
             )}
           </Button>
         </form>
