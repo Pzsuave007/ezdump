@@ -149,7 +149,7 @@ export default function FAQPage() {
       {/* Image Section */}
       <section className="relative h-64 md:h-80">
         <img 
-          src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/7qbljwnk_trash-hoard.webp" 
+          src="/images/trash-hoard.webp" 
           alt="Loaded trailer ready for hauling"
           className="w-full h-full object-cover"
         />

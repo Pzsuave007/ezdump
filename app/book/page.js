@@ -655,7 +655,7 @@ function BookingPageContent() {
       <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+            src="/images/dump-trailer3.webp" 
             alt="Dump trailer ready for your load"
             className="w-full h-full object-cover opacity-40"
           />
@@ -779,7 +779,7 @@ function BookingPageContent() {
             {/* Service Image */}
             <div className="mt-6 rounded-lg overflow-hidden shadow-md">
               <img 
-                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg"
+                src="/images/14ft-dump-trailer.jpg"
                 alt="Our dump trailer"
                 className="w-full h-48 object-cover"
               />

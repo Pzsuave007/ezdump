@@ -66,7 +66,7 @@ export default function HowItWorksPage() {
       <section className="relative bg-black text-white py-16 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+            src="/images/dump-trailer3.webp" 
             alt="Dump trailer"
             className="w-full h-full object-cover opacity-30"
           />

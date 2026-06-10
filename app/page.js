@@ -319,7 +319,7 @@ export default function HomePage() {
       <section className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+            src="/images/dump-trailer3.webp" 
             alt="Clean dump trailer ready for your load"
             className="w-full h-full object-cover opacity-40"
           />
@@ -701,7 +701,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 md:h-[450px] rounded-2xl overflow-hidden shadow-2xl">
               <img 
-                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg" 
+                src="/images/14ft-dump-trailer.jpg" 
                 alt="Our dump trailer ready for delivery"
                 className="w-full h-full object-cover"
               />
@@ -719,7 +719,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
-                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/7qbljwnk_trash-hoard.webp" 
+                src="/images/trash-hoard.webp" 
                 alt="Trailer loaded with household junk"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -729,7 +729,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
-                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/pqljudvy_dump%20trailer3.webp" 
+                src="/images/dump-trailer3.webp" 
                 alt="Dump trailer with wood sides"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -739,7 +739,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
-                src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/fyw8ooan_images.jfif" 
+                src="/images/junk-removal.jfif" 
                 alt="Dump trailer in action"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
@@ -780,7 +780,7 @@ export default function HomePage() {
       {/* Full Width Image Banner */}
       <section className="relative h-80 md:h-[400px]">
         <img 
-          src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
+          src="/images/labor-for-hire.webp" 
           alt="Loaded dump trailer with truck"
           className="w-full h-full object-cover"
         />

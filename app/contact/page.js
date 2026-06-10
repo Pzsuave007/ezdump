@@ -136,7 +136,7 @@ export default function ContactPage() {
       {/* Image Banner Section */}
       <section className="relative h-64 md:h-80">
         <img 
-          src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/rgi80q43_labor-for-hire-near-me.webp" 
+          src="/images/labor-for-hire.webp" 
           alt="Our dump trailer service in action"
           className="w-full h-full object-cover"
         />

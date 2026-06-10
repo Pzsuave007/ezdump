@@ -228,7 +228,7 @@ export default function PricingPage() {
       <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="https://customer-assets.emergentagent.com/job_dump-book/artifacts/8qzjl5qc_14Ft_Dump_Trailer.jpg" 
+            src="/images/14ft-dump-trailer.jpg" 
             alt="Dump trailer"
             className="w-full h-full object-cover opacity-30"
           />
