@@ -9,6 +9,36 @@ $nodeUrl = 'http://127.0.0.1:3002';
 // Get the request URI
 $requestUri = $_SERVER['REQUEST_URI'];
 
+// Serve static files directly from public_html if they exist
+$cleanPath = parse_url($requestUri, PHP_URL_PATH);
+$localFile = __DIR__ . $cleanPath;
+if ($cleanPath !== '/' && file_exists($localFile) && is_file($localFile)) {
+    // Determine content type
+    $ext = strtolower(pathinfo($localFile, PATHINFO_EXTENSION));
+    $mimeTypes = [
+        'webp' => 'image/webp',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'jfif' => 'image/jpeg',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+        'pdf' => 'application/pdf',
+    ];
+    if (isset($mimeTypes[$ext])) {
+        header('Content-Type: ' . $mimeTypes[$ext]);
+        header('Cache-Control: public, max-age=31536000');
+        readfile($localFile);
+        exit;
+    }
+}
+
 // Build the full URL to the Node.js app
 $url = $nodeUrl . $requestUri;
 
