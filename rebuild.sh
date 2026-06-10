@@ -8,6 +8,7 @@ echo "Rebuilding Easy Load & Dump..."
 # Copy updated files
 cp -r /home/ezloadndump/lib /opt/ezloadndump/
 cp -r /home/ezloadndump/app /opt/ezloadndump/
+cp -r /home/ezloadndump/public /opt/ezloadndump/
 
 # Rebuild
 cd /opt/ezloadndump
