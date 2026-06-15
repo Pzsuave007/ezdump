@@ -1,0 +1,17 @@
+[Unit]
+Description=ezloadndump Next.js app
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/ezloadndump
+ExecStart=/usr/bin/yarn start -p 3002
+Restart=on-failure
+RestartSec=3
+KillMode=control-group
+User=root
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=512
+
+[Install]
+WantedBy=multi-user.target
