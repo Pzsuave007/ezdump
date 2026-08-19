@@ -228,7 +228,7 @@ export default function PricingPage() {
       <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="/images/14ft-dump-trailer.jpg" 
+            src="/images/trailer-dumping.jpg" 
             alt="Dump trailer"
             className="w-full h-full object-cover opacity-30"
           />

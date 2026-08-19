@@ -136,7 +136,7 @@ export default function ContactPage() {
       {/* Image Banner Section */}
       <section className="relative h-64 md:h-80">
         <img 
-          src="/images/labor-for-hire.webp" 
+          src="/images/trailer-parked.webp" 
           alt="Our dump trailer service in action"
           className="w-full h-full object-cover"
         />

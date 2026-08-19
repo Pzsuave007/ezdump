@@ -18,7 +18,7 @@ export default function FAQPage() {
     },
     {
       question: 'What size is the dump trailer?',
-      answer: 'Our dump trailer can hold approximately 10-12 cubic yards of material, which is equivalent to about 4-6 pickup truck loads. It\'s perfect for most residential cleanouts, yard projects, and renovation debris.'
+      answer: 'Our dump trailer is 10ft long x 7ft wide with extended wood sides, giving it approximately 8-10 cubic yards of capacity — equivalent to about 4-6 pickup truck loads. It\'s perfect for most residential cleanouts, yard projects, and renovation debris.'
     },
     {
       question: 'How long is the rental period?',

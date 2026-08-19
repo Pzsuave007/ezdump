@@ -217,7 +217,7 @@ function BookingPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bookingId: booking.id,
-          origin: window.location.origin
+          originUrl: window.location.origin
         })
       });
       
@@ -655,7 +655,7 @@ function BookingPageContent() {
       <section className="relative bg-black text-white py-12 overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="/images/dump-trailer3.webp" 
+            src="/images/trailer-loaded.jfif" 
             alt="Dump trailer ready for your load"
             className="w-full h-full object-cover opacity-40"
           />
@@ -779,12 +779,12 @@ function BookingPageContent() {
             {/* Service Image */}
             <div className="mt-6 rounded-lg overflow-hidden shadow-md">
               <img 
-                src="/images/14ft-dump-trailer.jpg"
+                src="/images/trailer-dumping.jpg"
                 alt="Our dump trailer"
                 className="w-full h-48 object-cover"
               />
               <div className="bg-gray-900 text-white p-3 text-center text-sm">
-                Our 14ft dump trailer - ready for your job!
+                Our 10ft x 7ft dump trailer - ready for your job!
               </div>
             </div>
           </div>

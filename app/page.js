@@ -319,8 +319,8 @@ export default function HomePage() {
       <section className="relative bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 
-            src="/images/dump-trailer3.webp" 
-            alt="Clean dump trailer ready for your load"
+            src="/images/trailer-loaded.jfif" 
+            alt="Our IronBull dump trailer loaded and ready"
             className="w-full h-full object-cover opacity-40"
           />
         </div>
@@ -701,8 +701,8 @@ export default function HomePage() {
             </div>
             <div className="relative h-80 md:h-[450px] rounded-2xl overflow-hidden shadow-2xl">
               <img 
-                src="/images/14ft-dump-trailer.jpg" 
-                alt="Our dump trailer ready for delivery"
+                src="/images/trailer-dumping.jpg" 
+                alt="Our dump trailer in action"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -729,8 +729,8 @@ export default function HomePage() {
             </div>
             <div className="relative h-64 rounded-xl overflow-hidden group shadow-lg">
               <img 
-                src="/images/dump-trailer3.webp" 
-                alt="Dump trailer with wood sides"
+                src="/images/trailer-loaded.jfif" 
+                alt="Our dump trailer with wood sides ready for loading"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
@@ -780,14 +780,14 @@ export default function HomePage() {
       {/* Full Width Image Banner */}
       <section className="relative h-80 md:h-[400px]">
         <img 
-          src="/images/labor-for-hire.webp" 
-          alt="Loaded dump trailer with truck"
+          src="/images/trailer-parked.webp" 
+          alt="Our dump trailer parked and ready for your job"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Big Loads? No Problem.</h2>
-            <p className="text-xl text-gray-300 mb-6">Our trailer can handle up to 10-12 cubic yards of material</p>
+            <p className="text-xl text-gray-300 mb-6">Our 10ft x 7ft trailer with extended wood sides can handle up to 8-10 cubic yards of material</p>
             <Link href="/book">
               <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
                 Book Your Trailer
