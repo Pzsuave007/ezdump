@@ -787,7 +787,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
           <div className="text-center text-white px-4">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Big Loads? No Problem.</h2>
-            <p className="text-xl text-gray-300 mb-6">Our 10ft x 7ft trailer with extended wood sides can handle up to 8-10 cubic yards of material</p>
+            <p className="text-xl text-gray-300 mb-6">Our 10ft x 7ft trailer with extended wood sides can handle up to 7-10 cubic yards of material</p>
             <Link href="/book">
               <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
                 Book Your Trailer
